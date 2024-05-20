@@ -1,5 +1,5 @@
 {
-  "name": "Dogagatchi",
+  "name": "dogagatchi",
   "version": "1.0.0",
   "description": "Operation Spark Legacy project",
   "main": "server/index.js",
