@@ -165,7 +165,7 @@ app.get('/*', (req, res) => {
 
 // SERVER CONNECTION
 app.listen(port, () => {
-  console.log(`
-  Listening at: http://127.0.0.1:${port}
+  console.log(`\
+  Listening at:\n \n http://127.0.0.1:${port} \n\n http://localhost:${port}
   `);
 });
