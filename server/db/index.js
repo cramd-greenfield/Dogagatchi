@@ -39,6 +39,14 @@ const dogSchema = new mongoose.Schema({
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  words: [
+    {
+      word: String,
+      definition: String,
+      favorite: Boolean,
+      used: Boolean,
+    }
+  ],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
