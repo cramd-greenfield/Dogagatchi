@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   password: String, // may be changed with passport implementation
   coinCount: Number, // increments with correct question and decrements to feed play with dog
   questionCount: Number, // increments with correct answer and stays
-  dogCount: Number, // increments when dogogachi is creates and decrements if dogogachi is deleted
+  dogCount: Number, // increments when dogogatchi is creates and decrements if dogogatchi is deleted
   breeds: [String], // array of image strings that are correctly answered
   achievements: [{ name: String, image: String, description: String }],
   meals: [
@@ -45,13 +45,29 @@ const dogSchema = new mongoose.Schema({
       definition: String,
       favorite: Boolean,
       used: Boolean,
-    }
+    },
+  ],
+  groom: [
+    {
+      isSubscribed: Boolean,
+      cost: Number,
+    },
   ],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
 
+const groomSchema = new mongoose.Schema({
+  isSubscribed: Boolean,
+  cost: Number,
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+});
+
+const Groom = mongoose.model('Groom', groomSchema);
+
 module.exports = {
+  Groom,
   User,
   Dog,
 };
