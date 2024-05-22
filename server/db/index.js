@@ -47,6 +47,11 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     }
   ],
+  activities: [
+    {
+      activity: String
+    }
+  ]
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
