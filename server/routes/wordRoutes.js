@@ -8,14 +8,20 @@ const { RANDOM_WORD_KEY } = require('../config');
 
 // GET WORDS BY DOG ID
 
-router.get('/', (req, res) => {
-  
+router.get('/:dogId', (req, res) => {
+  const { dogId } = req.params;
+
   // this route should get the all words from a specific dog
   // the data sent in response will be used to populate the dogtionary
-  //
+  Dog.findById(dogId)
+    .then((dog) => {
+      res.status(200).send(dog.words)
+    })
+    .catch((err) => {
+      console.error('Failed to get dog from db', err);
+      res.sendStatus(500);
+    })
 
-
-  res.sendStatus(200);
 })
 
 // **************** POST ROUTES ********************
