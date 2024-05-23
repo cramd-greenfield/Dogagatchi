@@ -23,6 +23,7 @@ function Dog(props) {
   const [feedTimer, setFeedTimer] = useState(0);
   const [walkTimer, setWalkTimer] = useState(0);
   const [meals, setMeals] = useState([]);
+  const [word, setWord] = useState({});
   const [showWord, setShowWord] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
 
@@ -118,7 +119,22 @@ function Dog(props) {
     }
   };
 
-  const handleShowWord = () => setShowWord(true);
+  const fetchAndShowWord = () => {
+    // request to /words/:dogId
+    axios
+      .post(`/words/${dog._id}`)
+      .then(({ data }) => {
+        console.log('data recd from axios post');
+        console.log('keys', Object.keys(data))
+        console.log('data', data.meanings)
+        setWord(data);
+        setShowWord(true);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+
+  };
   const handleCloseWord = () => setShowWord(false);
 
   useEffect(() => {
@@ -266,17 +282,36 @@ function Dog(props) {
                 </Dropdown.Item>
               </DropdownButton>
             )}
-            {/* word of the day button here */}
-            <Button onClick={setShowWord}>
+
+            <Button onClick={fetchAndShowWord}>
               Word of the Day!
             </Button>
             <Modal show={showWord} onHide={handleCloseWord}>
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
-              <Modal.Body>
-                This is where the word object will go.
-              </Modal.Body>
+                { showWord ? (
+                  <Modal.Body>
+                    <h2>{ word.word }</h2>
+                    <p>{ word.phonetic }</p>
+                    {word.meanings.map((meaning) => {
+                      return (
+                        <>
+                          <em>{ meaning.partOfSpeech }</em>
+                          {meaning.definitions.map((def, i) => {
+                            return (
+                              <p>{ `${i + 1}: ${def}` }</p>
+                            )
+                          })}
+                        </>
+                      )
+                    })}
+                  </Modal.Body>
+                  ) : (
+                    <h2>placeholder</h2>
+                  )
+                }
+
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>
                   Close
@@ -286,6 +321,7 @@ function Dog(props) {
                 </Button>
               </Modal.Footer>
             </Modal>
+
           </div>
         </Card.Body>
       </div>
