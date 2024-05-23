@@ -11,8 +11,7 @@ const { RANDOM_WORD_KEY } = require('../config');
 router.get('/:dogId', (req, res) => {
   const { dogId } = req.params;
 
-  // this route should get the all words from a specific dog
-  // the data sent in response will be used to populate the dogtionary
+  // get all words from a specific dog
   Dog.findById(dogId)
     .then((dog) => {
       res.status(200).send(dog.words)
@@ -113,10 +112,22 @@ router.put('/', (req, res) => {
 
 // DELETE WORD BY DOG ID
 
-router.delete('/', (req, res) => {
+router.delete('/:dogId', (req, res) => {
+  const { dogId } = req.params;
+  const { wordObj } = req.body;
+  console.log('wordObj', wordObj)
 
-  // this route should handle deleting a word from a specific
-  //    dog's dogtionary
+  // delete word from dog
+  Dog.findByIdAndUpdate(dogId, {
+    $pull: { words: wordObj }
+  }, { returnDocument: 'after' })
+    .then((dog) => {
+      res.sendStatus(202);
+    })
+    .catch((err) => {
+      console.error('Failed to delete word', err);
+      res.sendStatus(500);
+    })
 
 })
 
