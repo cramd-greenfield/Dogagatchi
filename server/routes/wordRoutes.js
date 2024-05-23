@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const axios = require('axios');
 const { Dog } = require('../db/index');
 
 // **************** GET ROUTES ********************
@@ -20,10 +21,69 @@ router.get('/', (req, res) => {
 
 // POST WORD BY DOG ID
 
-router.post('/', (req, res) => {
+router.post('/:dogId', (req, res) => {
+  const { dogId } = req.params;
 
-  // this route should handle adding a word to a specific dog's
-  //    word key
+  // get word from random word api
+  axios
+    .get(`https://api.api-ninjas.com/v1/randomword`, {
+      headers: {
+        'X-Api-Key': 'k6gn8L4UREGpzhBsNJ4VRg==rmGdmyrZiUvBXMth'
+      }
+    })
+    .then(({ data }) => {
+      const { word } = data;
+
+      axios
+        .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+        .then(({ data }) => {
+
+          const defs = data[0].meanings.map((meaning, i) => {
+
+            // construct meaning object
+            const dbMeaning = {
+              partOfSpeech: meaning.partOfSpeech,
+              definitions: []
+            };
+
+            // then insert definitions to it
+            meaning.definitions.forEach((def) => {
+              dbMeaning.definitions.push(def.definition);
+            })
+
+            return dbMeaning;
+
+          })
+
+          const wordObj = {
+            word,
+            meanings: defs,
+            favorite: false,
+            used: false,
+          }
+
+          // add word to dog
+          Dog.findByIdAndUpdate(dogId, {
+            $push: { words: wordObj },
+          }, { returnDocument: 'after' })
+            .then((dog) => {
+              res.sendStatus(201);
+            })
+            .catch((err) => {
+              console.error('Failed to find dog', err);
+              res.sendStatus(500);
+            })
+
+        })
+        .catch((err) => {
+          console.error('Failed to get definition', err);
+          res.sendStatus(500);
+        })
+    })
+    .catch((err) => {
+      console.error('Failed to get random word', err);
+      res.sendStatus(500);
+    })
 
 })
 
