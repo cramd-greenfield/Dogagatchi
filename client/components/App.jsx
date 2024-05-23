@@ -13,7 +13,7 @@ import NavBar from './Navbar.jsx';
 import Restaurant from './Restaurant.jsx';
 import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
-import Groom from './Groom.jsx';
+import GroomShop from './GroomShop.jsx';
 function App() {
   return (
     <Context>
@@ -67,11 +67,11 @@ function App() {
               }
             />
             <Route
-              path='/groom'
+              path='/groomer'
               element={
                 <div>
                   <NavBar />
-                  <Groom />
+                  <GroomShop />
                 </div>
               }
             />
