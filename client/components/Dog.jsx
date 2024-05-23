@@ -5,6 +5,7 @@ import {
   Card,
   Dropdown,
   DropdownButton,
+  Modal,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -22,6 +23,7 @@ function Dog(props) {
   const [feedTimer, setFeedTimer] = useState(0);
   const [walkTimer, setWalkTimer] = useState(0);
   const [meals, setMeals] = useState([]);
+  const [showWord, setShowWord] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
 
   const hungryRef = useRef(null);
@@ -115,6 +117,9 @@ function Dog(props) {
       bark.play();
     }
   };
+
+  const handleShowWord = () => setShowWord(true);
+  const handleCloseWord = () => setShowWord(false);
 
   useEffect(() => {
     getDog();
@@ -261,6 +266,26 @@ function Dog(props) {
                 </Dropdown.Item>
               </DropdownButton>
             )}
+            {/* word of the day button here */}
+            <Button onClick={setShowWord}>
+              Word of the Day!
+            </Button>
+            <Modal show={showWord} onHide={handleCloseWord}>
+              <Modal.Header closeButton>
+                <Modal.Title>Word Of The Day</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+                This is where the word object will go.
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant='secondary' onClick={handleCloseWord}>
+                  Close
+                </Button>
+                <Button variant='primary'>
+                  Add to Dogtionary!
+                </Button>
+              </Modal.Footer>
+            </Modal>
           </div>
         </Card.Body>
       </div>
