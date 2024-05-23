@@ -55,32 +55,6 @@ function DogShop(props) {
     setShop(false);
   };
 
-  /************** Cody D. Legacy **********/
-  /*********** Subscribe to Groom *********/
-  const handleSubscribe = () => {
-    if (dogView === '' || dogName === '') {
-      alert('Fill all fields');
-    } else if (coins >= 200) {
-      axios
-        .post('/dog', {
-          name: dogName,
-          img: dogView,
-          owner: userId,
-          groom: true,
-        })
-        .then(({ data }) => {
-          setCoins(data.coinCount);
-        });
-      getDogs();
-      setDogs([]);
-      setList([]);
-    } else {
-      alert('Not enough coins!');
-    }
-    setShop(false);
-  };
-  /****************************************/
-
   return (
     <div>
       {dogShop ? (
@@ -152,14 +126,6 @@ function DogShop(props) {
                 onClick={() => handleSubmit()}
               >
                 Buy Dog
-              </Button>
-              <Form.Label>200 coins:</Form.Label>
-              <Button
-                variant='primary'
-                type='submit'
-                onClick={() => handleSubscribe()}
-              >
-                Subscribe to Groomer!
               </Button>
             </Form.Group>
           </Form>
