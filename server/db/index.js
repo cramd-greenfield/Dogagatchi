@@ -48,9 +48,7 @@ const dogSchema = new mongoose.Schema({
     }
   ],
   activities: [
-    {
-      activity: String
-    }
+      String
   ]
 });
 
