@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { Dog } = require('../db/index');
+const { RANDOM_WORD_KEY } = require('../config');
 
 // **************** GET ROUTES ********************
 
@@ -28,7 +29,7 @@ router.post('/:dogId', (req, res) => {
   axios
     .get(`https://api.api-ninjas.com/v1/randomword`, {
       headers: {
-        'X-Api-Key': 'k6gn8L4UREGpzhBsNJ4VRg==rmGdmyrZiUvBXMth'
+        'X-Api-Key': RANDOM_WORD_KEY,
       }
     })
     .then(({ data }) => {
