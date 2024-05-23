@@ -11,7 +11,11 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const dogRoutes = require('./routes/dogRoutes');
+
 const groomRoutes = require('./routes/groomRoutes');
+
+const wordRoutes = require('./routes/wordRoutes');
+
 
 const app = express();
 const routeHandler = express.Router();
@@ -34,7 +38,11 @@ app.use(passport.session());
 
 routeHandler.use('/user', userRoutes);
 routeHandler.use('/dog', dogRoutes);
+
 routeHandler.use('/groom', groomRoutes);
+
+routeHandler.use('/words', wordRoutes);
+
 app.use('/', routeHandler);
 
 passport.use(
