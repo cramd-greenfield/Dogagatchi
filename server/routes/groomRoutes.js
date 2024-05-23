@@ -19,52 +19,59 @@ router.get('/:userId', (req, res) => {
     });
 });
 
+// Get all dogs with a valid GroomId set to true
 router.get('/', (req, res) => {
   const { groomId } = req.params;
-  Groom.find({ groom: groomId }).then((groomData) => {
-    res.status(200).send(groomData);
-  });
+  Dog.find({ groom: groomId })
+    .then((groomData) => {
+      if (groomId) {
+        res.status(200).send(groomData);
+      } else {
+        console.log('Dog does not have Groom subscription');
+        res.sendStatus(404);
+      }
+    })
+    .catch((err) => console.error('failed to get Groomed dogs:', err));
 });
 
-router.post('/', (req, res) => {
-  const { isSubscribed } = req.body;
-  const status = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+// router.post('/', (req, res) => {
+//   const { isSubscribed } = req.body;
 
-  Groom.create({
-    isSubscribed,
-    feedDeadline: status,
-    walkDeadline: status,
-  })
-    .then(() => {
-      return User.findByIdAndUpdate(
-        owner,
-        { $inc: { coinCount: -15, dogCount: -1 }, $pull: { breeds: img } },
-        { new: true }
-      ).catch((err) => {
-        console.error('SERVER ERROR: failed to UPDATE user', err);
-        res.sendStatus(500);
-      });
-    })
-    .then((updatedUser) => {
-      res.status(201).send(updatedUser);
-    })
-    .catch((err) => {
-      console.error('SERVER ERROR: failed to CREATE dog', err);
-      res.sendStatus(500);
-    });
-});
+//   Groom.create({
+//     isSubscribed,
+//     feedDeadline: { $limit: 0 },
+//     walkDeadline: { $limit: 0 },
+//   })
+//     .then(() => {
+//       return User.findByIdAndUpdate(
+//         owner,
+//         { $inc: { coinCount: -200 }, $pull: { groomed: img } },
+//         { new: true }
+//       ).catch((err) => {
+//         console.error('SERVER ERROR: failed to UPDATE user', err);
+//         res.sendStatus(500);
+//       });
+//     })
+//     .then((updatedUser) => {
+//       res.status(201).send(updatedUser);
+//     })
+//     .catch((err) => {
+//       console.error('SERVER ERROR: failed to CREATE dog', err);
+//       res.sendStatus(500);
+//     });
+// });
 
-router.post('/', (req, res) => {
-  const { groom } = req.body;
-  const { subscribe, description, cost } = req.params;
-  console.log(req.body);
-  Groom.findOne({ id: groom.id })
-    .then((data) => {
-      if (!data) {
+router.post('/:groomId', (req, res) => {
+  const { groomId } = req.body;
+  // const { groom } = req.body;
+  const { isSubscribed, cost } = req.params;
+  // console.log(req.body);
+  Dog.findOne({ groom: groomId })
+    .then((subscribed) => {
+      if (!subscribed) {
         Groom.create({
-          subscribe: subscribe,
-          description: description,
-          cost: cost,
+          isSubscribed,
+          cost,
         }).then(() => res.sendStatus(201));
       } else {
         res.sendStatus(404);

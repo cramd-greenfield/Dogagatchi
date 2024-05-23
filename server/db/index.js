@@ -29,6 +29,7 @@ const userSchema = new mongoose.Schema({
     },
   ],
   img: String,
+  groomed: [String], // Array of dogs that are subscribed to grooms
 });
 // creates user docs in the db
 const User = mongoose.model('User', userSchema);
@@ -38,7 +39,6 @@ const dogSchema = new mongoose.Schema({
   img: String, // breed
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   words: [
     {
       word: String,
@@ -47,12 +47,8 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     },
   ],
-  groom: [
-    {
-      isSubscribed: Boolean,
-      cost: Number,
-    },
-  ],
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  groom: { type: mongoose.Schema.Types.ObjectId, ref: 'Groom' },
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
