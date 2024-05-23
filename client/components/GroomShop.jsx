@@ -23,6 +23,7 @@ function GroomShop(props) {
   const [dogName, setDogName] = useState('');
   const [userId, setUserId] = useState(user._id);
   const [subscribe, setSubscribe] = useState(false);
+  const [index, setIndex] = useState(0);
 
   const getSignedInUserData = (userId) => {
     axios
@@ -33,10 +34,6 @@ function GroomShop(props) {
       })
       .catch((err) => console.error('get signed in user ERROR', err));
   };
-  useEffect(() => {
-    getSignedInUserData(signedInUser._id);
-    //use storage to get user from db the set user state as db user obj
-  }, []);
 
   const getDogs = () => {
     axios
@@ -45,6 +42,14 @@ function GroomShop(props) {
       .catch((err) => {
         console.error(err);
       });
+  };
+
+  useEffect(() => {
+    getSignedInUserData(signedInUser._id);
+  }, []);
+  // Slice feature
+  const dogSelect = (selectedIndex) => {
+    setIndex(selectedIndex);
   };
 
   const handleSelect = (img) => {
@@ -81,41 +86,30 @@ function GroomShop(props) {
           gridTemplateColumns: 'auto auto',
         }}
       >
-        <Image src={dogView} alt='' rounded style={{ width: 200 }} />
+        <Form>
+          <Form.Group>
+            {/* <Image
+              src={dogView}
+              alt=''
+              rounded
+              style={{ width: 400, height: 300 }}
+            /> */}
+            {breeds.map((dog, index) => {
+              return (
+                <Groom key={`${dog}-${index}`} dog={dog} /> >
+                <img src={dog} style={{ width: '500px' }} />
+              );
+            })}
+          </Form.Group>
 
-        <Carousel>
-          <Carousel.Item
-            style={{ width: '300px' }}
-            onSelect={() => {
-              handleSelect(dog);
-            }}
-            variant='success'
-            id='dropdown-basic'
+          <Button
+            variant='primary'
+            type='submit'
+            onClick={() => handleSubscribe()}
           >
-            Select Dog
-          </Carousel.Item>
-
-          {breeds.map((dog, index) => {
-            (
-              <div>
-                key={`${dog}-${index}`}
-                onClick={() => setDogView(dog)}
-                onChange=
-                {(e) => {
-                  setSubscribe(e.target.value);
-                }}
-              </div>
-            ) > <img src={dog} style={{ width: '250px' }} />;
-          })}
-        </Carousel>
-        <Form.Label>200 coins:</Form.Label>
-        <Button
-          variant='primary'
-          type='submit'
-          onClick={() => handleSubscribe()}
-        >
-          Buy Groom
-        </Button>
+            200 Coins!
+          </Button>
+        </Form>
       </div>
     </div>
   );
