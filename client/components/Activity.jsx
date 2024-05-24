@@ -5,13 +5,18 @@ import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 function Activity(props) {
   // have state for showing the modals
   const [show, setShow] = useState(false);
+  const [newActivity, setNewActivity] = useState('');
+  const [dogHobbies, setDogHobbies] = useState([]);
+
   const handleNewActivityClick = () => {
     // make req '/api/activities'
     axios
       .get('/api/activities')
       .then(({data}) => {
         // access activity from data.hobby
-        // pass
+        // console.log(data.hobby);
+        setNewActivity(data.hobby);
+        setShow(true);
       })
       .catch((err) => console.error(err));
     // change show to true
@@ -20,6 +25,7 @@ function Activity(props) {
   const handleClose = () => {
     // for close button
     //set show to false
+    setShow(false);
   };
 
   const handleSave = () => {
@@ -48,9 +54,9 @@ function Activity(props) {
           >
             <Button onClick={handleNewActivityClick}>New Activity!</Button>
 
-            <Modal onShow={show}>
+            <Modal show={show} onHide={handleClose}>
               <Modal.Header closeButton>New Activity:</Modal.Header>
-              <Modal.Body>Hello</Modal.Body>
+              <Modal.Body>{newActivity}</Modal.Body>
               <Modal.Footer>
                 <Button>Save Activity</Button>
               </Modal.Footer>
