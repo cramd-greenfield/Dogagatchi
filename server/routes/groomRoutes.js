@@ -7,71 +7,63 @@ const router = Router();
 router.get('/:userId', (req, res) => {
   const { userId } = req.params;
   Dog.find({ owner: userId })
-    // .where()
-    .then((dogsArray) => {
-      User.findById(userId).then(() => {
-        res.status(200).send({ dogsArray });
-      });
+    .then((groomed) => {
+      User.findById(userId)
+        .then(({ breeds }) => {
+          res.status(200).send({ groomed, breeds });
+        })
+        .catch((err) => {
+          console.error('Owner does not have any dogs:', err);
+        });
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to GET dog by userId', err);
+      console.error('failed to GET dog by userId', err);
       res.sendStatus(500);
     });
 });
 
+// Get all dogs with a valid GroomId set to true
 router.get('/', (req, res) => {
   const { groomId } = req.params;
-  Groom.find({ groom: groomId }).then((groomData) => {
-    res.status(200).send(groomData);
-  });
+  Dog.find({ groom: groomId })
+    .then((groomData) => {
+      if (groomId) {
+        res.status(200).send(groomData);
+      } else {
+        console.log('Dog does not have Groom subscription');
+        res.sendStatus(404);
+      }
+    })
+    .catch((err) => console.error('failed to get Groomed dogs:', err));
 });
 
-router.post('/', (req, res) => {
-  const { isSubscribed } = req.body;
-  const status = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
+// Subscribing from the shop
+router.post('/groomer', (req, res) => {
+  const { name, img, owner } = req.body;
 
-  Groom.create({
-    isSubscribed,
-    feedDeadline: status,
-    walkDeadline: status,
+  Dog.create({
+    name,
+    img,
+    owner,
+    feedDeadline: { $limit: 0 },
+    walkDeadline: { $limit: 0 },
   })
     .then(() => {
       return User.findByIdAndUpdate(
         owner,
-        { $inc: { coinCount: -15, dogCount: -1 }, $pull: { breeds: img } },
+        { $inc: { coinCount: -200, dogCount: -1 }, $pull: { breeds: img } },
         { new: true }
-      ).catch((err) => {
-        console.error('SERVER ERROR: failed to UPDATE user', err);
-        res.sendStatus(500);
-      });
-    })
-    .then((updatedUser) => {
-      res.status(201).send(updatedUser);
-    })
-    .catch((err) => {
-      console.error('SERVER ERROR: failed to CREATE dog', err);
-      res.sendStatus(500);
-    });
-});
-
-router.post('/', (req, res) => {
-  const { groom } = req.body;
-  const { subscribe, description, cost } = req.params;
-  console.log(req.body);
-  Groom.findOne({ id: groom.id })
-    .then((data) => {
-      if (!data) {
-        Groom.create({
-          subscribe: subscribe,
-          description: description,
-          cost: cost,
-        }).then(() => res.sendStatus(201));
-      } else {
-        res.sendStatus(404);
-      }
+      )
+        .then((updatedUser) => {
+          res.status(201).send(updatedUser);
+        })
+        .catch((err) => {
+          console.error('Failed to update user:', err);
+          res.sendStatus(500);
+        });
     })
     .catch((err) => {
-      console.error('Failed:', err);
+      console.error('Failed to CREATE dog Groom', err);
       res.sendStatus(500);
     });
 });
