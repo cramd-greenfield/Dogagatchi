@@ -7,14 +7,17 @@ const router = Router();
 router.get('/:userId', (req, res) => {
   const { userId } = req.params;
   Dog.find({ owner: userId })
-    // .where()
-    .then((dogsArray) => {
-      User.findById(userId).then(() => {
-        res.status(200).send({ dogsArray });
-      });
+    .then((groomed) => {
+      User.findById(userId)
+        .then(({ breeds }) => {
+          res.status(200).send({ groomed, breeds });
+        })
+        .catch((err) => {
+          console.error('Owner does not have any dogs:', err);
+        });
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to GET dog by userId', err);
+      console.error('failed to GET dog by userId', err);
       res.sendStatus(500);
     });
 });
@@ -34,51 +37,33 @@ router.get('/', (req, res) => {
     .catch((err) => console.error('failed to get Groomed dogs:', err));
 });
 
-// router.post('/', (req, res) => {
-//   const { isSubscribed } = req.body;
+// Subscribing from the shop
+router.post('/groomer', (req, res) => {
+  const { name, img, owner } = req.body;
 
-//   Groom.create({
-//     isSubscribed,
-//     feedDeadline: { $limit: 0 },
-//     walkDeadline: { $limit: 0 },
-//   })
-//     .then(() => {
-//       return User.findByIdAndUpdate(
-//         owner,
-//         { $inc: { coinCount: -200 }, $pull: { groomed: img } },
-//         { new: true }
-//       ).catch((err) => {
-//         console.error('SERVER ERROR: failed to UPDATE user', err);
-//         res.sendStatus(500);
-//       });
-//     })
-//     .then((updatedUser) => {
-//       res.status(201).send(updatedUser);
-//     })
-//     .catch((err) => {
-//       console.error('SERVER ERROR: failed to CREATE dog', err);
-//       res.sendStatus(500);
-//     });
-// });
-
-router.post('/:groomId', (req, res) => {
-  const { groomId } = req.body;
-  // const { groom } = req.body;
-  const { isSubscribed, cost } = req.params;
-  // console.log(req.body);
-  Dog.findOne({ groom: groomId })
-    .then((subscribed) => {
-      if (!subscribed) {
-        Groom.create({
-          isSubscribed,
-          cost,
-        }).then(() => res.sendStatus(201));
-      } else {
-        res.sendStatus(404);
-      }
+  Dog.create({
+    name,
+    img,
+    owner,
+    feedDeadline: { $limit: 0 },
+    walkDeadline: { $limit: 0 },
+  })
+    .then(() => {
+      return User.findByIdAndUpdate(
+        owner,
+        { $inc: { coinCount: -200, dogCount: -1 }, $pull: { breeds: img } },
+        { new: true }
+      )
+        .then((updatedUser) => {
+          res.status(201).send(updatedUser);
+        })
+        .catch((err) => {
+          console.error('Failed to update user:', err);
+          res.sendStatus(500);
+        });
     })
     .catch((err) => {
-      console.error('Failed:', err);
+      console.error('Failed to CREATE dog Groom', err);
       res.sendStatus(500);
     });
 });
