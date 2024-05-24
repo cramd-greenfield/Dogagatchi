@@ -111,6 +111,24 @@ router.put('/meals/:userId', (req, res) => {
 
 })
 
+// UPDATE COINS BY ID
+router.put('/activities/:userId', (req, res) => {
+    const { userId } = req.params;
+    // const { coinCount } = req.body;
+
+    User.findByIdAndUpdate(userId, {
+        $inc: {coinCount: 1}
+    }, { returnDocument: 'after'})
+        .then(updatedUser => {
+            if (updatedUser) {
+                res.status(200).send(updatedUser)
+            } else {
+                res.sendStatus(404)
+            }
+        })
+        .catch(err => res.sendStatus(500))
+});
+
 //UPDATE USER BY USER ID
 
 router.put('/:_id', (req, res) => {

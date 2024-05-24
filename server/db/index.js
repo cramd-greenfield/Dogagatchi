@@ -53,6 +53,9 @@ const dogSchema = new mongoose.Schema({
       cost: Number,
     },
   ],
+  activities: [
+      String
+  ]
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
