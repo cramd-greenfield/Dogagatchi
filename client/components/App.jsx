@@ -13,7 +13,7 @@ import NavBar from './Navbar.jsx';
 import Restaurant from './Restaurant.jsx';
 import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
-import GroomShop from './GroomShop.jsx';
+
 function App() {
   return (
     <Context>
