@@ -1,54 +1,54 @@
-const express = require('express')
-const router = express.Router()
-const { Dog, User } = require('../db/index');
-
+const express = require("express");
+const router = express.Router();
+const { Dog, User } = require("../db/index");
 
 // **************** GET ROUTES ********************
 
 //GET DOG BY USER ID
 
-router.get('/users/:userId', (req, res) => {
+router.get("/users/:userId", (req, res) => {
   const { userId } = req.params;
-  Dog.find().where({ owner: userId })
+  Dog.find()
+    .where({ owner: userId })
     .then((dogsArr) => {
       User.findById(userId)
         .then(({ breeds }) => {
-          res.status(200)
-            .send({ dogsArr, breeds })
+          res.status(200).send({ dogsArr, breeds });
         })
         .catch((err) => {
-          console.error('SERVER ERROR: failed to GET user breeds list by id', err);
+          console.error(
+            "SERVER ERROR: failed to GET user breeds list by id",
+            err
+          );
           res.sendStatus(500);
         });
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to GET dog by userId', err);
+      console.error("SERVER ERROR: failed to GET dog by userId", err);
       res.sendStatus(500);
     });
 });
 
 //GET DOG BY DOG ID
 
-router.get('/id/:dogId', (req, res) => {
+router.get("/id/:dogId", (req, res) => {
   const { dogId } = req.params;
-
-  
 
   Dog.findById(dogId)
     .then((dog) => {
-      res.status(200).send(dog)
+      res.status(200).send(dog);
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to GET dog by id', err);
+      console.error("SERVER ERROR: failed to GET dog by id", err);
       res.sendStatus(500);
     });
-})
+});
 
 // **************** POST ROUTES ********************
 
 //POST DOG
 
-router.post('/', (req, res) => {
+router.post("/", (req, res) => {
   const { name, img, owner } = req.body;
   const status = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
 
@@ -57,81 +57,137 @@ router.post('/', (req, res) => {
     img,
     owner,
     feedDeadline: status,
-    walkDeadline: status
+    walkDeadline: status,
   })
     .then(() => {
-      return User.findByIdAndUpdate(owner, { $inc: { coinCount: -15, dogCount: -1 }, $pull: { breeds: img } }, { new: true })
-        .catch((err) => {
-          console.error('SERVER ERROR: failed to UPDATE user', err);
-          res.sendStatus(500);
-        })
+      return User.findByIdAndUpdate(
+        owner,
+        { $inc: { coinCount: -15, dogCount: -1 }, $pull: { breeds: img } },
+        { new: true }
+      ).catch((err) => {
+        console.error("SERVER ERROR: failed to UPDATE user", err);
+        res.sendStatus(500);
+      });
     })
     .then((updatedUser) => {
-        res.status(201).send(updatedUser)
+      res.status(201).send(updatedUser);
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to CREATE dog', err);
+      console.error("SERVER ERROR: failed to CREATE dog", err);
       res.sendStatus(500);
-    })
-})
+    });
+});
 
 // **************** PUT ROUTES ********************
 
 //PUT BY DOG ID
 
-router.put('/:dogId', (req, res) => {
-    const { dogId } = req.params;
-    const { status, cost } = req.body;
+router.put("/:dogId", (req, res) => {
+  const { dogId } = req.params;
+  const { status, cost } = req.body;
 
-    Dog.findByIdAndUpdate(dogId, status, { returnDocument: 'after' })
-        .then((updatedDog) => {
-            if (updatedDog && cost === -3) {
-                User.findByIdAndUpdate(updatedDog.owner, { $inc: { coinCount: cost } }, {new: true})
-                    .then((updatedUser) => {
-                        res.status(200).send(updatedUser);
-                    })
-                    .catch((err) => {
-                        console.error('SERVER ERROR: failed to UPDATE user coins by id', err);
-                        res.sendStatus(500);
-                    });
-            } else if (updatedDog) {
-                User.findById(updatedDog.owner)
-                    .then((updatedUser) => {
-                        res.status(200).send(updatedUser);
-                    })
-                    .catch((err) => {
-                        console.error('SERVER ERROR: failed to UPDATE user coins by id', err);
-                        res.sendStatus(500);
-                    });
-            } else {
-                res.sendStatus(404);
-            }
-        })
-        .catch((err) => {
-            console.error('SERVER ERROR: failed to UPDATE dog status by id', err);
+  Dog.findByIdAndUpdate(dogId, status, { returnDocument: "after" })
+    .then((updatedDog) => {
+      if (updatedDog && cost === -3) {
+        User.findByIdAndUpdate(
+          updatedDog.owner,
+          { $inc: { coinCount: cost } },
+          { new: true }
+        )
+          .then((updatedUser) => {
+            res.status(200).send(updatedUser);
+          })
+          .catch((err) => {
+            console.error(
+              "SERVER ERROR: failed to UPDATE user coins by id",
+              err
+            );
             res.sendStatus(500);
-        });
+          });
+      } else if (updatedDog) {
+        User.findById(updatedDog.owner)
+          .then((updatedUser) => {
+            res.status(200).send(updatedUser);
+          })
+          .catch((err) => {
+            console.error(
+              "SERVER ERROR: failed to UPDATE user coins by id",
+              err
+            );
+            res.sendStatus(500);
+          });
+      } else {
+        res.sendStatus(404);
+      }
+    })
+    .catch((err) => {
+      console.error("SERVER ERROR: failed to UPDATE dog status by id", err);
+      res.sendStatus(500);
+    });
 });
 
+// PUT ACTIVITIES BY DOG ID
+// saving an activity OR deleting an activity
+router.put("/activities/:dogId", (req, res) => {
+  const { dogId } = req.params;
+  const { activityUpdate, newActivity } = req.body; 
+  if (activityUpdate === "addActivity") {
+    Dog.findByIdAndUpdate(dogId, {
+      $push: { activities: newActivity },
+    })
+      .then((oldObj) => {
+        if (oldObj) {
+          // find + send the updated dog
+          Dog.findById(dogId)
+            .then((updatedDog) => {
+              res.status(200).send(updatedDog);
+            })
+            .catch((err) => {
+              res.sendStatus(500);
+            });
+        } else {
+          res.sendStatus(404);
+        }
+      })
+      .catch((err) => res.sendStatus(500));
+  } else if (activityUpdate === "deleteActivity") {
+    Dog.findByIdAndUpdate(dogId, {
+      $pull: { activities: newActivity },
+    })
+      .then((oldObj) => {
+        if (oldObj) {
+          Dog.findById(dogId)
+            .then((updatedDog) => {
+              res.status(200).send(updatedDog);
+            })
+            .catch((err) => {
+              res.sendStatus(500);
+            });
+        } else {
+          res.sendStatus(404);
+        }
+      })
+      .catch((err) => res.sendStatus(500));
+  }
+});
 // **************** DELETE ROUTES ********************
 
-
 // DELETE ALL DOGS BY USER ID
-router.delete('/all/:ownerId', (req, res) => {
-  const { ownerId } = req.params
-  
-  Dog.deleteMany({ owner: ownerId})
-  .then((deleted) => {
-    console.log(deleted)
-    res.sendStatus(200)
-  })
-  .catch((err) => {
-    console.error('deleted all dogs by user ERROR', err)
-  })
-} )
+router.delete("/all/:ownerId", (req, res) => {
+  const { ownerId } = req.params;
+
+  Dog.deleteMany({ owner: ownerId })
+    .then((deleted) => {
+      console.log(deleted);
+      res.sendStatus(200);
+    })
+    .catch((err) => {
+      console.error("deleted all dogs by user ERROR", err);
+    });
+});
 
 //DELETE BY DOG ID
-router.delete('/:dogId', (req, res) => {
+router.delete("/:dogId", (req, res) => {
   const { dogId } = req.params;
 
   Dog.findByIdAndDelete(dogId)
@@ -143,17 +199,9 @@ router.delete('/:dogId', (req, res) => {
       }
     })
     .catch((err) => {
-      console.error('SERVER ERROR: failed to DELETE dog by id', err);
+      console.error("SERVER ERROR: failed to DELETE dog by id", err);
       res.sendStatus(500);
     });
-})
+});
 
-
-
-
-
-
-
-
-
-module.exports = router
+module.exports = router;

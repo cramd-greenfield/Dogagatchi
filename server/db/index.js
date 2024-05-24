@@ -48,7 +48,13 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     },
   ],
-  groom: Boolean,
+  groom: [
+    {
+      isSubscribed: Boolean,
+      cost: Number,
+    },
+  ],
+  activities: [String],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);

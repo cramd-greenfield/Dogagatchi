@@ -21,6 +21,7 @@ const { User, Dog } = require('./db/index');
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const hobbiesApi = process.env.HOBBIES_API_KEY;
 
 const distPath = path.resolve(__dirname, '..', 'dist');
 
@@ -37,6 +38,7 @@ routeHandler.use('/user', userRoutes);
 routeHandler.use('/dog', dogRoutes);
 routeHandler.use('/groom', groomRoutes);
 routeHandler.use('/words', wordRoutes);
+
 app.use('/', routeHandler);
 
 passport.use(
@@ -157,6 +159,22 @@ app.get('/api/quiz', (req, res) => {
     .get('https://dog.ceo/api/breeds/image/random/4')
     .then((response) => {
       res.status(200).send(response.data.message);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+});
+
+app.get('/api/activities', (req, res) => {
+  axios
+    .get('https://api.api-ninjas.com/v1/hobbies', {
+      headers: {
+        'x-api-key': hobbiesApi,
+      },
+    })
+    .then(({ data }) => {
+      console.log(data);
+      res.status(200).send(data);
     })
     .catch((err) => {
       console.error(err);
