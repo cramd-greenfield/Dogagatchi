@@ -48,12 +48,7 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     },
   ],
-  groom: [
-    {
-      isSubscribed: Boolean,
-      cost: Number,
-    },
-  ],
+  groom: Boolean,
   activities: [String],
 });
 
