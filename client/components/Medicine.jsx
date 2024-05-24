@@ -6,7 +6,7 @@ import { Card, Image } from 'react-bootstrap'
 function Medicine(props) {
   const { user, medicine, setUser, setCoins } = props
   const [purchaseText, setPurchaseText] = useState('')
-  {console.log('MEDICINE PROPS', props)}
+  
   
   const buyMedicine = () => {
     const newCoinCount = user.coinCount - meal.cost
