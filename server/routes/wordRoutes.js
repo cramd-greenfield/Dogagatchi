@@ -101,10 +101,41 @@ router.post('/:dogId', (req, res) => {
 
 // UPDATE WORD BY DOG ID
 
-router.put('/', (req, res) => {
+router.patch('/:dogId/:updateWord', (req, res) => {
+  const { dogId, updateWord } = req.params;
+  console.log('wordId', updateWord);
+  const { wordObj, update } = req.body;
 
-  // this route should handle flipping the used boolean to true
-  // also handle marking word as a favorite
+  // update favorite
+  if (update.type === 'favorite') {
+
+    Dog.findById(dogId,
+      { '$set': { 'words.$[word].favorite': true } },
+      { 'arrayFilters': [ { word: updateWord }]}
+    )
+    .then((dog) => {
+
+      // $set operator
+      // or use word object to replace/update with new boolean sent in req
+      //    would use an update object argument after dogId
+      dog.words.forEach((word) => {
+        if (word.word === updateWord) {
+          console.log('found');
+          console.log(word.favorite);
+          word['favorite'] = true;
+        }
+
+      })
+
+      res.sendStatus(202);
+    })
+    .catch((err) => {
+      console.error('Failed to update word', err);
+      res.sendStatus(500);
+    })
+  } else if (update.type === 'used') { // update used
+
+  }
 
 })
 
