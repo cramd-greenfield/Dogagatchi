@@ -13,9 +13,7 @@ import NavBar from './Navbar.jsx';
 import Restaurant from './Restaurant.jsx';
 import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
-import GetWellCenter from './GetWellCenter.jsx';
 import GroomShop from './GroomShop.jsx';
-
 function App() {
   return (
     <Context>
@@ -67,24 +65,6 @@ function App() {
                   <Restaurant />
                 </div>
               }
-            />
-            <Route
-              path='/groomer'
-              element={
-                <div>
-                  <NavBar />
-                  <GroomShop />
-                </div>
-              }
-            />
-            <Route 
-              path='/getwellcenter' 
-               element={
-                 <div>
-                  <NavBar/>
-                  <GetWellCenter/>
-                 </div>
-               }
             />
             <Route
               path='/about'
