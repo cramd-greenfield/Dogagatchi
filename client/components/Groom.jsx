@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Button from 'react-bootstrap/Button';
 import React, { useState, useEffect } from 'react';
-import { Card, Image, Form, Dropdown, Carousel } from 'react-bootstrap';
+import { Card, Image, Form, Carousel } from 'react-bootstrap';
 import Dog from './Dog.jsx';
 
 function Groom(props) {
@@ -80,18 +80,18 @@ function Groom(props) {
       >
         <Form>
           <Form.Group>
-            <Form.Label></Form.Label>
+            <Form.Label>Which Dog would you like to sign up?</Form.Label>
           </Form.Group>
-          <Form.Group>
-            <Carousel slide={false} activeIndex={index} onSelect={handleSelect}>
-              <Carousel.Item
-                style={{ width: '300px' }}
-                variant='success'
-                id='dropdown-basic'
-              >
-                <Image src={dogView} alt='' rounded style={{ width: 200 }} />
-              </Carousel.Item>
-
+          {/* <Form.Group> */}
+          <Card>
+            <Carousel
+              // style={{ width: '500px', height: '500px' }}
+              slide={false}
+              interval={null}
+              indicators={false}
+              activeIndex={index}
+              onSelect={handleSelect}
+            >
               {breeds.map((dog, idx) => (
                 <Carousel.Item
                   onChange={() => setDogView(dog)}
@@ -102,15 +102,20 @@ function Groom(props) {
                 </Carousel.Item>
               ))}
             </Carousel>
-          </Form.Group>
+          </Card>
+          <Carousel.Item style={{ width: '300px', height: '300px' }}>
+            <Image
+              src={dogView}
+              alt={setDogView[breeds[0]]}
+              fluid
+              // style={{ width: 300, height: 300 }}
+            />
+          </Carousel.Item>
+          {/* </Form.Group> */}
           <Form.Group>
             <Form.Label></Form.Label>
-            <Button
-              variant='primary'
-              type='submit'
-              onClick={() => handleSubmit()}
-            >
-              200 Coins
+            <Button variant='warning' type='submit' onClick={() => subscribe()}>
+              💎 200 Coins 💎
             </Button>
           </Form.Group>
         </Form>
