@@ -50,22 +50,13 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     },
   ],
-  groom: Boolean,
+  isGroomed: Boolean,
   activities: [String],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
 
-const groomSchema = new mongoose.Schema({
-  isSubscribed: Boolean,
-  cost: Number,
-  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
-});
-
-const Groom = mongoose.model('Groom', groomSchema);
-
 module.exports = {
-  Groom,
   User,
   Dog,
 };
