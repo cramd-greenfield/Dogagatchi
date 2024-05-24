@@ -31,6 +31,9 @@ function NavBar(props) {
             <Nav.Link className='ms-auto' as={Link} to='/groomer'>
               Groom Shop✂️
             </Nav.Link>
+            <Nav.Link className="ms-auto" as={Link} to="/getwellcenter">
+              Get Well Center 💉
+            </Nav.Link>
             <Nav.Link className='ms-auto' as={Link} to='/leaderboard'>
               Top Dawgs 🏆
             </Nav.Link>
