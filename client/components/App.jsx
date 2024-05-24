@@ -15,7 +15,6 @@ import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
 import Activity from './Activity.jsx';
 import GetWellCenter from './GetWellCenter.jsx';
-import GroomShop from './GroomShop.jsx';
 
 function App() {
   return (
