@@ -49,7 +49,7 @@ router.get('/id/:dogId', (req, res) => {
 //POST DOG
 
 router.post('/', (req, res) => {
-  const { name, img, owner, groomed } = req.body;
+  const { name, img, owner, isGroomed } = req.body;
   const status = new Date(new Date().getTime() + 24 * 60 * 60 * 1000);
 
   Dog.create({
@@ -58,7 +58,7 @@ router.post('/', (req, res) => {
     owner,
     feedDeadline: status,
     walkDeadline: status,
-    groomed: false,
+    isGroomed: false,
   })
     .then(() => {
       return User.findByIdAndUpdate(
