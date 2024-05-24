@@ -11,6 +11,7 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const dogRoutes = require('./routes/dogRoutes');
+const groomRoutes = require('./routes/groomRoutes');
 const wordRoutes = require('./routes/wordRoutes');
 
 const app = express();
@@ -20,6 +21,7 @@ const { User, Dog } = require('./db/index');
 
 const clientId = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const hobbiesApi = process.env.HOBBIES_API_KEY;
 
 const distPath = path.resolve(__dirname, '..', 'dist');
 
@@ -34,7 +36,9 @@ app.use(passport.session());
 
 routeHandler.use('/user', userRoutes);
 routeHandler.use('/dog', dogRoutes);
+routeHandler.use('/groom', groomRoutes);
 routeHandler.use('/words', wordRoutes);
+
 app.use('/', routeHandler);
 
 passport.use(
@@ -161,13 +165,29 @@ app.get('/api/quiz', (req, res) => {
     });
 });
 
+app.get('/api/activities', (req, res) => {
+  axios
+    .get('https://api.api-ninjas.com/v1/hobbies', {
+      headers: {
+        'x-api-key': hobbiesApi,
+      },
+    })
+    .then(({ data }) => {
+      console.log(data);
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      console.error(err);
+    });
+});
+
 app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, '..', 'dist', 'index.html'));
 });
 
 // SERVER CONNECTION
 app.listen(port, () => {
-  console.log(`
-  Listening at: http://127.0.0.1:${port}
+  console.log(`\
+  Listening at:\n \n http://127.0.0.1:${port} \n\n http://localhost:${port}
   `);
 });
