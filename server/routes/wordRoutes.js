@@ -58,17 +58,21 @@ router.post('/:dogId', (req, res) => {
 
           const wordObj = {
             word,
+            phonetic: data[0].phonetic,
             meanings: defs,
             favorite: false,
             used: false,
           }
+          console.log('wordObj', wordObj);
 
           // add word to dog
           Dog.findByIdAndUpdate(dogId, {
             $push: { words: wordObj },
           }, { returnDocument: 'after' })
             .then((dog) => {
-              res.sendStatus(201);
+              const { data } = dog;
+              console.log('dog', dog.words[dog.words.length - 1])
+              res.status(201).send(dog.words[dog.words.length - 1]);
             })
             .catch((err) => {
               console.error('Failed to find dog', err);

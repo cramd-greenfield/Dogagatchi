@@ -43,6 +43,8 @@ const dogSchema = new mongoose.Schema({
   words: [
     {
       word: String,
+      phonetic: String,
+      meanings: [{ partOfSpeech: String, definitions: [String] }],
       definition: String,
       favorite: Boolean,
       used: Boolean,
