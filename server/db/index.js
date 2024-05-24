@@ -53,16 +53,16 @@ const dogSchema = new mongoose.Schema({
 
 const Dog = mongoose.model('Dog', dogSchema);
 
-// const groomSchema = new mongoose.Schema({
-//   isSubscribed: Boolean,
-//   cost: Number,
-//   dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
-// });
+const groomSchema = new mongoose.Schema({
+  isSubscribed: Boolean,
+  cost: Number,
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
+});
 
-// const Groom = mongoose.model('Groom', groomSchema);
+const Groom = mongoose.model('Groom', groomSchema);
 
 module.exports = {
-  // Groom,
+  Groom,
   User,
   Dog,
 };
