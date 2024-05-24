@@ -6,7 +6,7 @@ import { Card, Image } from 'react-bootstrap'
 function Meal(props) {
   const { user, meal, setUser, setCoins } = props
   const [purchaseText, setPurchaseText] = useState('')
-  // {console.log('MEAL PROPS', props)}
+
   //put request to add meal to user's meal array and subtract coins from user's coinCount
   const buyMeal = () => {
     const newCoinCount = user.coinCount - meal.cost
