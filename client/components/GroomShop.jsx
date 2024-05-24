@@ -10,108 +10,93 @@ import {
   Image,
 } from 'react-bootstrap/';
 import Groom from './Groom.jsx';
-import Dog from './Dog.jsx';
 
-function GroomShop(props) {
-  const { dog } = props;
+function GroomShop() {
+  /********************Test ***********/
   const [user, setUser] = useState({});
   const [coins, setCoins] = useState(0);
   const signedInUser = JSON.parse(sessionStorage.user);
-  const [groomShop, setShop] = useState(false);
-  const [breeds, setList] = useState([]);
-  const [dogView, setDogView] = useState('');
-  const [dogName, setDogName] = useState('');
-  const [userId, setUserId] = useState(user._id);
-  const [subscribe, setSubscribe] = useState(false);
-  const [index, setIndex] = useState(0);
 
   const getSignedInUserData = (userId) => {
     axios
       .get(`/user/${userId}`)
       .then(({ data }) => {
+        // console.log(data);
         setUser(data[0]);
         setCoins(data[0].coinCount);
       })
       .catch((err) => console.error('get signed in user ERROR', err));
   };
-
-  const getDogs = () => {
-    axios
-      .get(`/groom/${userId}`)
-      .then(({ data }) => setList(data.breeds))
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
   useEffect(() => {
     getSignedInUserData(signedInUser._id);
   }, []);
-  // Slice feature
-  const dogSelect = (selectedIndex) => {
-    setIndex(selectedIndex);
-  };
 
-  const handleSelect = (img) => {
-    console.log('hit', img);
-    setDogView(img);
-  };
-
-  const handleSubscribe = () => {
-    if (coins >= 200) {
-      axios
-        .post('/groom', {
-          name: dogName,
-          img: dogView,
-          owner: userId,
-          groom: true,
-        })
-        .then(({ data }) => {
-          setCoins(data.coinCount);
-        });
-      getDogs();
-      setDogs([]);
-      setList([]);
-    } else {
-      alert('Not enough coins!');
-    }
-    setShop(false);
-  };
+  // WILL BE USED FOR UPDATE
+  //
+  // const handleSubscribe = () => {
+  //   if (coins >= 200) {
+  //     axios
+  //       .post('/groom', {
+  //         name: dogName,
+  //         img: dogView,
+  //         owner: userId,
+  //         groom: true,
+  //       })
+  //       .then(({ data }) => {
+  //         setCoins(data.coinCount);
+  //       });
+  //     getDogs();
+  //     setDogs([]);
+  //     setList([]);
+  //   } else {
+  //     alert('Not enough coins!');
+  //   }
+  //   setShop(false);
+  // };
 
   return (
-    <div>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'auto auto',
-        }}
-      >
-        <Form>
-          <Form.Group>
-            {/* <Image
-              src={dogView}
-              alt=''
-              rounded
-              style={{ width: 400, height: 300 }}
-            /> */}
-            {breeds.map((dog, index) => {
-              return (
-                <Groom key={`${dog}-${index}`} dog={dog} /> >
-                <img src={dog} style={{ width: '500px' }} />
-              );
-            })}
-          </Form.Group>
-
-          <Button
-            variant='primary'
-            type='submit'
-            onClick={() => handleSubscribe()}
+    <Container>
+      <Row>
+        <Col xs={1}></Col>
+        <Col
+          xs={10}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <h1>Welcome to the Groomer!</h1>
+          <p
+            style={{
+              color: '#0D6EfD',
+              fontWeight: 'bold',
+            }}
           >
-            200 Coins!
-          </Button>
-        </Form>
-      </div>
-    </div>
+            {`You've got ${coins} coins to spend!`}
+          </p>
+        </Col>
+        <Col xs={1}></Col>
+      </Row>
+      <Row>
+        <Col xs={1}></Col>
+        <Col
+          xs={10}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <div className='dogs-container'>
+            <Groom />
+          </div>
+        </Col>
+        <Col xs={1}></Col>
+      </Row>
+    </Container>
   );
 }
 export default GroomShop;
