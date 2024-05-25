@@ -164,7 +164,7 @@ function Dog(props) {
 
   useEffect(() => {
     getDog();
-  }, [happy, hungry]);
+  }, [happy, hungry, health]);
 
   useEffect(() => {
     const x = setInterval(() => {
@@ -310,8 +310,16 @@ function Dog(props) {
                 🐕‍🦺
               </Button>
             )}
+            <ProgressBar
+              animated={true}
+              striped
+              variant={healthStatus}
+              now={medicineTimer}
+              label="HEALTH"
+              style={{ height: "35px" }}
+            />
             {meals ? (
-              <DropdownButton title="Feed from Pantry!!!!">
+              <DropdownButton title="Feed from Pantry!">
                 {meals.map((meal) => (
                   <Dropdown.Item
                     key={meal._id}
@@ -331,12 +339,12 @@ function Dog(props) {
               </DropdownButton>
             )}
             {medicines ? (
-              <DropdownButton title="Give medicine!!!!">
+              <DropdownButton title="Cure with Meds!">
                 {medicines.map((medicine) => (
                   <Dropdown.Item
                     key={medicine._id}
                     onClick={() => {
-                      feedDog(dog, medicine);
+                      giveMedicine(dog, medicine);
                     }}
                   >
                     {medicine.name}
@@ -346,10 +354,11 @@ function Dog(props) {
             ) : (
               <DropdownButton title="Feed from Pantry!">
                 <Dropdown.Item>
-                  Visit Bone Appétit Café to buy your first meal!
+                  Go to the Get Well Center before ya dog die and become a PACK🚬!
                 </Dropdown.Item>
               </DropdownButton>
             )}
+            
           </div>
         </Card.Body>
       </div>
