@@ -5,6 +5,8 @@ import {
   Card,
   Dropdown,
   DropdownButton,
+  ButtonGroup,
+  ToggleButton,
   Modal,
   Form,
 } from 'react-bootstrap';
@@ -177,6 +179,22 @@ function Dog(props) {
       .delete(`/words/${word}`)
       .then(() => { openDogtionary() })
       .catch((err) => { console.error('Failed to delete word', err) })
+  }
+
+  const addFavoriteWord = (e) => {
+    // update word.favorite in db
+    const word = e.target.value;
+    axios
+      .patch(`/words/${word}`, {
+        update: {
+            type: 'favorite'
+        },
+        favUpdate: {
+            favorite: true
+        }
+    })
+    .then(() => { console.log('fav updated')})
+    .catch((err) => { console.error('Failed to update favorite word', err)})
   }
 
   const openDogtionary = () => {
@@ -406,6 +424,18 @@ function Dog(props) {
                       <Modal.Dialog key={`${i}`}>
                         <h2>{ word.word }</h2>
                         <p>{ word.phonetic }</p>
+                        <ButtonGroup>
+                          <ToggleButton
+                            id="toggle-check"
+                            type="checkbox"
+                            variant="secondary"
+                            // checked={checked}
+                            value={word.word}
+                            onChange={addFavoriteWord}
+                          >
+                            ⭐️
+                          </ToggleButton>
+                        </ButtonGroup>
                         {word.meanings.map((meaning, i) => {
                           return (
                             <div key={i}>

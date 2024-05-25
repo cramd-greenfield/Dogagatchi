@@ -106,27 +106,26 @@ router.post('/dogtionary', (req, res) => {
 
 // UPDATE WORD BY DOG ID
 
-router.patch('/:wordId', (req, res) => {
-  const { wordId } = req.params;
-  console.log('wordId', wordId);
+router.patch('/:word', (req, res) => {
+  const { word } = req.params;
   const { update, favUpdate, dogtionaryUpdate, usedUpdate } = req.body;
 
   // update favorite
   if (update.type === 'favorite') {
 
-    Word.findByIdAndUpdate(wordId, favUpdate)
+    Word.findOneAndUpdate({ word }, favUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
 
   } else if (update.type === 'dogtionary') { // update dogtionary status
 
-    Word.findByIdAndUpdate(wordId, dogtionaryUpdate)
+    Word.findOneAndUpdate({ word }, dogtionaryUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
 
   } else if (update.type === 'used') [ // update used status
 
-    Word.findByIdAndUpdate(wordId, usedUpdate)
+    Word.findOneAndUpdate({ word }, usedUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
   ]
