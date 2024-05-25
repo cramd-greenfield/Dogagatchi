@@ -120,6 +120,29 @@ router.put('/meals/:userId', (req, res) => {
 
 })
 
+router.put('/medicines/:userId', (req, res) => {
+    const { userId } = req.params;
+    const { coinCount, medicines, update, medicineToDelete } = req.body
+
+    if (update.type === 'buyMedicine') {
+        User.findByIdAndUpdate(userId, {
+            $set: { coinCount: coinCount.newCount },
+            $push: { medicines: medicines.medicine }
+        }, { returnDocument: 'after' })
+            .then((updatedUser) => {
+                updatedUser ? res.status(200).send(updatedUser) : res.sendStatus(404)
+            })
+            .catch((err) => console.error('medicines put req server ERROR:', err))
+    } else if (update.type === 'deleteMedicine') {
+        User.findByIdAndUpdate(userId, {
+            $pull: { medicines: medicineToDelete }
+        })
+            .then((updatedDoc) => res.status(200).send(updatedDoc))
+            .catch((err) => console.error('could not delete medicine', err))
+    }
+
+})
+
 // UPDATE COINS BY ID
 router.put('/activities/:userId', (req, res) => {
     const { userId } = req.params;
