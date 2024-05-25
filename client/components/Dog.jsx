@@ -147,11 +147,6 @@ function Dog(props) {
     axios
       .post(`/words/${dog._id}`)
       .then(({ data }) => {
-      
-        console.log('data recd from axios post');
-        console.log('keys', Object.keys(data));
-        console.log('data', data.meanings);
-
         setWord(data);
         setShowWord(true);
       })
@@ -313,7 +308,7 @@ function Dog(props) {
             )}
 
             <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-            <Modal show={showWord} onHide={handleCloseWord}>
+            <Modal show={showWord} onHide={handleCloseWord} scrollable={true}>
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
@@ -322,14 +317,14 @@ function Dog(props) {
                 <Modal.Body>
                   <h2>{word.word}</h2>
                   <p>{word.phonetic}</p>
-                  {word.meanings.map((meaning) => {
+                  {word.meanings.map((meaning, i) => {
                     return (
-                      <>
+                      <div key={`${i}`}>
                         <em>{meaning.partOfSpeech}</em>
                         {meaning.definitions.map((def, i) => {
-                          return <p>{`${i + 1}: ${def}`}</p>;
+                          return <p key={`${i}`}>{`${i + 1}: ${def}`}</p>;
                         })}
-                      </>
+                      </div>
                     );
                   })}
                 </Modal.Body>
