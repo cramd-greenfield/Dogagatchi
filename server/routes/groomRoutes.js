@@ -44,11 +44,10 @@ router.get('/member/:userId', (req, res) => {
 
 // change to isGroomed to create subscription
 router.patch('/:dogId', (req, res) => {
-  const { img, owner } = req.body;
+  const { img, owner, url } = req.body;
   const { dogId } = req.params;
-  const status = new Date('3000-12-31T23:59:99Z');
+  const status = new Date('3000-12-31T23:59:00Z');
 
-  console.log(status1);
   console.log(status);
   Dog.findByIdAndUpdate(dogId, {
     $set: { isGroomed: true, feedDeadline: status, walkDeadline: status },
@@ -58,7 +57,7 @@ router.patch('/:dogId', (req, res) => {
         owner,
         {
           $inc: { coinCount: -200 },
-          $push: { groomed: img },
+          $push: { groomed: url },
         },
         { new: true }
       ).catch((err) => {
@@ -74,39 +73,6 @@ router.patch('/:dogId', (req, res) => {
       res.sendStatus(500);
     });
 });
-
-// router.post('/', (req, res) => {
-//   const { name, img, owner } = req.body;
-//   const { id } = req.params;
-//     const status = new Date(new Date().getTime() + 100000000 * 100000);
-//   console.log(status);
-
-//   Dog.findOneAndReplace(id, {
-//     name,
-//     img,
-//     owner,
-//     feedDeadline: status,
-//     walkDeadline: status,
-//     isGroomed: true,
-//   })
-//     .then(() => {
-//       return User.findByIdAndUpdate(
-//         owner,
-//         { $inc: { coinCount: -15, dogCount: -1 }, $pull: { groomed: img } },
-//         { new: true }
-//       ).catch((err) => {
-//         console.error('SERVER ERROR: failed to UPDATE user', err);
-//         res.sendStatus(500);
-//       });
-//     })
-//     .then((updatedUser) => {
-//       res.status(201).send(updatedUser);
-//     })
-//     .catch((err) => {
-//       console.error('SERVER ERROR: failed to CREATE dog', err);
-//       res.sendStatus(500);
-//     });
-// });
 
 router.delete('/groomed/:dogId', (req, res) => {
   //
