@@ -284,12 +284,22 @@ body {
   flex-wrap: wrap;
 }
 
+.medicine-container {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
 .meals-container {
   display: flex;
   flex-direction: row;
   justify-content: space-evenly;
   flex-wrap: wrap;
 }
+
+
 
 #pantry {
   min-height: 500px;
@@ -300,6 +310,11 @@ body {
 }
 
 .meal-image {
+  width: 150px;
+  height: 150px
+}
+
+.medicine-image {
   width: 150px;
   height: 150px
 }
@@ -315,6 +330,13 @@ body {
   border-radius: 15px;
 }
 #meal-item {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 5px;
+  margin-bottom: 2px
+}
+
+#medicine-item {
   margin-left: 20px;
   margin-right: 20px;
   margin-top: 5px;
