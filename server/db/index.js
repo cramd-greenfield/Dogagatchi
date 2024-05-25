@@ -38,6 +38,7 @@ const dogSchema = new mongoose.Schema({
   img: String, // breed
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
+  medicineDeadline: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 });
 

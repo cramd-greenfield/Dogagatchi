@@ -17,15 +17,20 @@ function Dog(props) {
   const [dog, setDog] = useState(dogObj);
   const [hungry, setHunger] = useState(true);
   const [happy, setHappy] = useState(false);
+  const [health, setHealth] = useState(true);
   const [feedStatus, setFeedStatus] = useState("");
   const [walkStatus, setWalkStatus] = useState("");
+  const [healthStatus, setHealthStatus] = useState("");
   const [feedTimer, setFeedTimer] = useState(0);
   const [walkTimer, setWalkTimer] = useState(0);
+  const [medicineTimer, setMedicineTimer] = useState(0);
   const [meals, setMeals] = useState([]);
+  const [medicines, setMedicines] = useState([]); //useState hook that updates the medicines array
   const user = JSON.parse(sessionStorage.getItem("user"));
 
   const hungryRef = useRef(null);
   const happyRef = useRef(null);
+  const medicineRef = useRef(null);
 
   useEffect(() => {
     getSignedInUserMeals(user._id);
@@ -78,6 +83,30 @@ function Dog(props) {
       })
       .catch((err) => console.error("feed dog meal ERROR:", err));
   };
+                          // (dogToFeedObj, mealToFeedObj) 
+  const giveMedicine = (dogToGiveMeds, medsToGiveObj) => {
+    const status = {
+      feedDeadline: new Date(
+        new Date(dogToGiveMeds.feedDeadline).getTime() + 24 * 60 * 60 * 1000
+      ),
+
+    };
+
+    axios
+      .put(`dog/${dogToGiveMeds._id}`, { status })
+      .then(getDog())
+      .then(() => {
+        axios
+          .put(`user/medicines/${user._id}`, {
+            update: {
+              type: "deleteMedicine",
+            },
+            medicineToDelete: medsToGiveObj,
+          })
+          .then(() => getSignedInUserMeals(user._id));
+      })
+      .catch((err) => console.error("feed dog meal ERROR:", err));
+  };
 
   const handleClick = (e) => {
     const status = {};
@@ -111,6 +140,23 @@ function Dog(props) {
         .catch((err) => {
           console.error(err);
         });
+      } else if (e === "medicine" && coins < 1) {
+        alert("Not enough coins!");
+      } else if (e === "medicine" && coins >= 1) {
+        setHealth(false);
+        medicineRef.current = sick;
+        const medicineDeadline = Date.parse(dog.medicineDeadline) + 12 * 60 * 60 * 1000;
+        status.medicineDeadline = medicineDeadline;
+        setMedicineTimer(medicineDeadline);
+        axios
+          .put(`/dog/${dog._id}`, { status, cost: -3 })
+          .then(({ data }) => {
+            setCoins(data.coinCount);
+          })
+          .then(() => getDog())
+          .catch((err) => {
+            console.error(err);
+          });
     } else {
       bark.play();
     }
@@ -126,9 +172,12 @@ function Dog(props) {
 
       const feedTimer = ((Date.parse(dog.feedDeadline) - now) / 86400000) * 100;
       const walkTimer = ((Date.parse(dog.walkDeadline) - now) / 86400000) * 100;
+      const medicineTimer = ((Date.parse(dog.medicineDeadline) - now) / 86400000) * 100;
 
       setFeedTimer(feedTimer);
       setWalkTimer(walkTimer);
+      setMedicineTimer(medicineTimer);
+
 
       if (feedTimer < 25) {
         setFeedStatus("danger");
@@ -167,6 +216,26 @@ function Dog(props) {
         if (happyRef.current !== true) {
           setHappy(true);
           happyRef.current = happy;
+        }
+      }
+
+      if (medicineTimer < 25) {
+        setHealthStatus("danger");
+        if (medicineRef.current !== true) {
+          setHealth(true);
+          medicineRef.current = sick;
+        }
+      } else if (medicineTimer < 50) {
+        setHealthStatus("warning");
+        if (medicineRef.current !== true) {
+          setHealth(true);
+          medicineRef.current = sick;
+        }
+      } else {
+        setHealthStatus("success");
+        if (medicineRef.current !== false) {
+          setHealth(false);
+          medicineRef.current = sick;
         }
       }
     }, 1000);
@@ -242,7 +311,7 @@ function Dog(props) {
               </Button>
             )}
             {meals ? (
-              <DropdownButton title="Feed from Pantry!">
+              <DropdownButton title="Feed from Pantry!!!!">
                 {meals.map((meal) => (
                   <Dropdown.Item
                     key={meal._id}
@@ -251,6 +320,26 @@ function Dog(props) {
                     }}
                   >
                     {meal.name}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            ) : (
+              <DropdownButton title="Feed from Pantry!">
+                <Dropdown.Item>
+                  Visit Bone Appétit Café to buy your first meal!
+                </Dropdown.Item>
+              </DropdownButton>
+            )}
+            {medicines ? (
+              <DropdownButton title="Give medicine!!!!">
+                {medicines.map((medicine) => (
+                  <Dropdown.Item
+                    key={medicine._id}
+                    onClick={() => {
+                      feedDog(dog, medicine);
+                    }}
+                  >
+                    {medicine.name}
                   </Dropdown.Item>
                 ))}
               </DropdownButton>

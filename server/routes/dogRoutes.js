@@ -57,7 +57,8 @@ router.post('/', (req, res) => {
     img,
     owner,
     feedDeadline: status,
-    walkDeadline: status
+    walkDeadline: status,
+    medicineDeadline: status,
   })
     .then(() => {
       return User.findByIdAndUpdate(owner, { $inc: { coinCount: -15, dogCount: -1 }, $pull: { breeds: img } }, { new: true })
