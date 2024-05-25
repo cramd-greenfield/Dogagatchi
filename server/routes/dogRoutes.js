@@ -58,7 +58,11 @@ router.post('/', (req, res) => {
     owner,
     feedDeadline: status,
     walkDeadline: status,
+
+    medicineDeadline: status,
+
     isGroomed: false,
+
   })
     .then(() => {
       return User.findByIdAndUpdate(

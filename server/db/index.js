@@ -28,6 +28,15 @@ const userSchema = new mongoose.Schema({
       fullTime: String,
     },
   ],
+  medicines: [
+    {
+      name: String,
+      image: String,
+      idMedicine: Number,
+      cost: Number,
+      fullTime: String,
+    },
+  ],
   img: String,
   groomed: [String], // Array of dogs that are subscribed to grooms
 });
@@ -39,6 +48,7 @@ const dogSchema = new mongoose.Schema({
   img: String, // breed
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
+  medicineDeadline: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   isGroomed: Boolean, 
   activities: [String],
