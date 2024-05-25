@@ -13,6 +13,7 @@ import NavBar from './Navbar.jsx';
 import DogShop from './DogShop.jsx';
 import Achievements from './Achievements.jsx';
 import Kennel from './Kennel.jsx';
+import Grooms from './Grooms.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -73,16 +74,18 @@ function User(props) {
   };
   const getGroomed = () => {
     axios
-      .get(`/groom/member/${userObj._id}`)
+      .get(`/groom/member`)
       .then(({ data }) => {
-        console.log(data);
-        // setDogs(data.dogsArr);
+        setGroomed(data);
         setLoading(false);
       })
       .catch((err) => {
         console.error(err);
       });
   };
+  useEffect(() => {
+    getGroomed();
+  }, []);
 
   const deleteUser = () => {
     axios
@@ -245,6 +248,7 @@ function User(props) {
           ) : dogs.length === 0 ? (
             <h1>Start playing Pooch Picker to earn dogs to adopt!</h1>
           ) : (
+            // (
             <div className='dogs'>
               <Kennel
                 className='user-kennel'
@@ -254,6 +258,19 @@ function User(props) {
                 setCoins={setCoins}
               />
             </div>
+            // )}
+            // {groomed ? (
+            //   <div className='groomed-dogs'>
+            //     <Grooms
+            //       className='user-groomed'
+            //       dogs={dogs}
+            //       getGroomed={getGroomed}
+            //       coins={coins}
+            //       setCoins={setCoins}
+            //     />
+            //   </div>
+            // ) : (
+            //   ''
           )}
         </Col>
       </Row>
