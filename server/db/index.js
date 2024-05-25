@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
       fullTime: String,
     },
   ],
+  activities: [
+    String
+],
   medicines: [
     {
       name: String,
