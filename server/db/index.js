@@ -40,7 +40,7 @@ const dogSchema = new mongoose.Schema({
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  isGroomed: Boolean, 
+  isGroomed: Boolean,
   activities: [String],
 });
 
@@ -53,7 +53,7 @@ const wordSchema = new mongoose.Schema({
   dogtionary: Boolean,
   favorite: Boolean,
   used: Boolean,
-  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog'},
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
 });
 
 const Word = mongoose.model('Word', wordSchema);
