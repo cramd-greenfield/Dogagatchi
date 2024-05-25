@@ -19,11 +19,17 @@ function Dog(props) {
   const [dog, setDog] = useState(dogObj);
   const [hungry, setHunger] = useState(true);
   const [happy, setHappy] = useState(false);
+
+  const [health, setHealth] = useState(true);
   const [feedStatus, setFeedStatus] = useState('');
   const [walkStatus, setWalkStatus] = useState('');
+  const [healthStatus, setHealthStatus] = useState('');
+
   const [feedTimer, setFeedTimer] = useState(0);
   const [walkTimer, setWalkTimer] = useState(0);
+  const [medicineTimer, setMedicineTimer] = useState(0);
   const [meals, setMeals] = useState([]);
+  const [medicines, setMedicines] = useState([]); //useState hook that updates the medicines array
   const [word, setWord] = useState({});
   const [showWord, setShowWord] = useState(false);
   const [groom, setGroom] = useState([]);
@@ -32,9 +38,14 @@ function Dog(props) {
 
   const hungryRef = useRef(null);
   const happyRef = useRef(null);
+  const medicineRef = useRef(null);
 
   useEffect(() => {
     getSignedInUserMeals(user._id);
+  }, []);
+
+  useEffect(() => {
+    getSignedInUserMedicines(user._id);
   }, []);
 
   const getDog = () => {
@@ -55,6 +66,19 @@ function Dog(props) {
         );
 
         setMeals(sortedMeals);
+      })
+      .catch((err) => console.error('get signed in user ERROR', err));
+  };
+
+  const getSignedInUserMedicines = (userIdParam) => {
+    axios
+      .get(`/user/medicines/${userIdParam}`)
+      .then(({ data }) => {
+        const sortedMedicines = data.medicines.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+        //console.log('meals', sortedMeals)
+        setMedicines(sortedMedicines);
       })
       .catch((err) => console.error('get signed in user ERROR', err));
   };
@@ -100,6 +124,30 @@ function Dog(props) {
   };
   /************ Subscribe for Groom **********/
 
+  // (dogToFeedObj, mealToFeedObj)
+  const giveMedicine = (dogToGiveMeds, medsToGiveObj) => {
+    const status = {
+      medicineDeadline: new Date(
+        new Date(dogToGiveMeds.medicineDeadline).getTime() + 24 * 60 * 60 * 1000
+      ),
+    };
+
+    axios
+      .put(`dog/${dogToGiveMeds._id}`, { status })
+      .then(getDog())
+      .then(() => {
+        axios
+          .put(`user/medicines/${user._id}`, {
+            update: {
+              type: 'deleteMedicine',
+            },
+            medicineToDelete: medsToGiveObj,
+          })
+          .then(() => getSignedInUserMedicines(user._id));
+      })
+      .catch((err) => console.error('feed dog meal ERROR:', err));
+  };
+
   const handleClick = (e) => {
     const status = {};
 
@@ -123,6 +171,24 @@ function Dog(props) {
       const feedDeadline = Date.parse(dog.feedDeadline) + 12 * 60 * 60 * 1000;
       status.feedDeadline = feedDeadline;
       setFeedTimer(feedDeadline);
+      axios
+        .put(`/dog/${dog._id}`, { status, cost: -3 })
+        .then(({ data }) => {
+          setCoins(data.coinCount);
+        })
+        .then(() => getDog())
+        .catch((err) => {
+          console.error(err);
+        });
+    } else if (e === 'medicine' && coins < 1) {
+      alert('Not enough coins!');
+    } else if (e === 'medicine' && coins >= 1) {
+      setHealth(false);
+      medicineRef.current = health;
+      const medicineDeadline =
+        Date.parse(dog.medicineDeadline) + 12 * 60 * 60 * 1000;
+      status.medicineDeadline = medicineDeadline;
+      setMedicineTimer(medicineDeadline);
       axios
         .put(`/dog/${dog._id}`, { status, cost: -3 })
         .then(({ data }) => {
@@ -157,7 +223,7 @@ function Dog(props) {
 
   useEffect(() => {
     getDog();
-  }, [happy, hungry]);
+  }, [happy, hungry, health]);
 
   useEffect(() => {
     const x = setInterval(() => {
@@ -165,9 +231,12 @@ function Dog(props) {
 
       const feedTimer = ((Date.parse(dog.feedDeadline) - now) / 86400000) * 100;
       const walkTimer = ((Date.parse(dog.walkDeadline) - now) / 86400000) * 100;
+      const medicineTimer =
+        ((Date.parse(dog.medicineDeadline) - now) / 86400000) * 100;
 
       setFeedTimer(feedTimer);
       setWalkTimer(walkTimer);
+      setMedicineTimer(medicineTimer);
 
       if (feedTimer < 25) {
         setFeedStatus('danger');
@@ -208,9 +277,29 @@ function Dog(props) {
           happyRef.current = happy;
         }
       }
+
+      if (medicineTimer < 25) {
+        setHealthStatus('danger');
+        if (medicineRef.current !== true) {
+          setHealth(true);
+          medicineRef.current = health;
+        }
+      } else if (medicineTimer < 50) {
+        setHealthStatus('warning');
+        if (medicineRef.current !== true) {
+          setHealth(true);
+          medicineRef.current = health;
+        }
+      } else {
+        setHealthStatus('success');
+        if (medicineRef.current !== false) {
+          setHealth(false);
+          medicineRef.current = health;
+        }
+      }
     }, 1000);
     return () => clearInterval(x);
-  }, [happy, hungry, dog]);
+  }, [happy, hungry, health, dog]);
 
   return (
     <div>
@@ -345,6 +434,14 @@ function Dog(props) {
                     🐕‍🦺
                   </Button>
                 )}
+                <ProgressBar
+                  animated={true}
+                  striped
+                  variant={healthStatus}
+                  now={medicineTimer}
+                  label='HEALTH'
+                  style={{ height: '35px' }}
+                />
                 {meals ? (
                   <DropdownButton title='Feed from Pantry!'>
                     {meals.map((meal) => (
@@ -362,6 +459,27 @@ function Dog(props) {
                   <DropdownButton title='Feed from Pantry!'>
                     <Dropdown.Item>
                       Visit Bone Appétit Café to buy your first meal!
+                    </Dropdown.Item>
+                  </DropdownButton>
+                )}
+                {medicines ? (
+                  <DropdownButton title='Cure with Meds!'>
+                    {medicines.map((medicine) => (
+                      <Dropdown.Item
+                        key={medicine._id}
+                        onClick={() => {
+                          giveMedicine(dog, medicine);
+                        }}
+                      >
+                        {medicine.name}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                ) : (
+                  <DropdownButton title='Feed from Pantry!'>
+                    <Dropdown.Item>
+                      Go to the Get Well Center before ya dog die and become a
+                      PACK🚬!
                     </Dropdown.Item>
                   </DropdownButton>
                 )}

@@ -22,8 +22,10 @@ function Kennel(props) {
                 ((Date.parse(dog.feedDeadline) - now) / 86400000) * 100;
               const walk =
                 ((Date.parse(dog.walkDeadline) - now) / 86400000) * 100;
+              const medicine =
+                ((Date.parse(dog.medicineDeadline) - now) / 86400000) * 100;
 
-              if (walk < 0 || feed < 0) {
+              if (walk < 0 || feed < 0 || medicine < 0) {
                 axios
                   .delete(`/dog/${dog._id}`)
                   .then(() => alert(`${dog.name} ran away!`))

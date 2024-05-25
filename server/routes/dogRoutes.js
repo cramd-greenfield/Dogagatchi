@@ -58,7 +58,11 @@ router.post('/', (req, res) => {
     owner,
     feedDeadline: status,
     walkDeadline: status,
+
+    medicineDeadline: status,
+
     isGroomed: false,
+
   })
     .then(() => {
       return User.findByIdAndUpdate(
@@ -127,50 +131,6 @@ router.put('/:dogId', (req, res) => {
     });
 });
 
-// PUT ACTIVITIES BY DOG ID
-// saving an activity OR deleting an activity
-router.put('/activities/:dogId', (req, res) => {
-  const { dogId } = req.params;
-  const { activityUpdate, newActivity } = req.body;
-  if (activityUpdate === 'addActivity') {
-    Dog.findByIdAndUpdate(dogId, {
-      $push: { activities: newActivity },
-    })
-      .then((oldObj) => {
-        if (oldObj) {
-          // find + send the updated dog
-          Dog.findById(dogId)
-            .then((updatedDog) => {
-              res.status(200).send(updatedDog);
-            })
-            .catch((err) => {
-              res.sendStatus(500);
-            });
-        } else {
-          res.sendStatus(404);
-        }
-      })
-      .catch((err) => res.sendStatus(500));
-  } else if (activityUpdate === 'deleteActivity') {
-    Dog.findByIdAndUpdate(dogId, {
-      $pull: { activities: newActivity },
-    })
-      .then((oldObj) => {
-        if (oldObj) {
-          Dog.findById(dogId)
-            .then((updatedDog) => {
-              res.status(200).send(updatedDog);
-            })
-            .catch((err) => {
-              res.sendStatus(500);
-            });
-        } else {
-          res.sendStatus(404);
-        }
-      })
-      .catch((err) => res.sendStatus(500));
-  }
-});
 // **************** DELETE ROUTES ********************
 
 // DELETE ALL DOGS BY USER ID
