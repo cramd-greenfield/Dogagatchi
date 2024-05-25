@@ -13,7 +13,6 @@ import NavBar from './Navbar.jsx';
 import DogShop from './DogShop.jsx';
 import Achievements from './Achievements.jsx';
 import Kennel from './Kennel.jsx';
-import Grooms from './Grooms.jsx';
 import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 
@@ -246,27 +245,15 @@ function User(props) {
           ) : dogs.length === 0 ? (
             <h1>Start playing Pooch Picker to earn dogs to adopt!</h1>
           ) : (
-            (
-              <div className='dogs'>
-                <Kennel
-                  className='user-kennel'
-                  dogs={dogs}
-                  getKennel={getKennel}
-                  coins={coins}
-                  setCoins={setCoins}
-                />
-              </div>
-            ) || (
-              <div className='groomed-dogs'>
-                <Grooms
-                  className='user-groomed'
-                  dogs={dogs}
-                  getGroomed={getGroomed}
-                  coins={coins}
-                  setCoins={setCoins}
-                />
-              </div>
-            )
+            <div className='dogs'>
+              <Kennel
+                className='user-kennel'
+                dogs={dogs}
+                getKennel={getKennel}
+                coins={coins}
+                setCoins={setCoins}
+              />
+            </div>
           )}
         </Col>
       </Row>
