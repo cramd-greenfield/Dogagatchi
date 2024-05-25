@@ -27,6 +27,8 @@ function Dog(props) {
   const [meals, setMeals] = useState([]);
   const [word, setWord] = useState({});
   const [showWord, setShowWord] = useState(false);
+  const [dogtionary, setDogtionary] = useState([]);
+  const [showDogtionary, setShowDogtionary] = useState(false);
   const [groomed, setGroomed] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -147,9 +149,8 @@ function Dog(props) {
     axios
       .get(`/words/randomWord`)
       .then(({ data }) => {
-        console.log('data', data)
+        // add dog id to word object
         data.dog = dog._id;
-        console.log('word Obj', data);
         setWord(data);
         setShowWord(true);
       })
@@ -159,19 +160,29 @@ function Dog(props) {
   };
 
   const addWordToDogtionary = () => {
-    console.log('add to dogtionary');
     // send POST request with word object
     axios
       .post('/words/dogtionary', {
         wordObj: word,
       })
-      .then(() => {
-        console.log('added to dogtionary');
-      })
       .catch((err) => { console.error('Failed to add word to dogtionary', err) });
+  };
+
+  const openDogtionary = () => {
+    // get wordObjs from db in an array
+    axios
+      .get(`/words/dog/${dog._id}`)
+      .then(({ data }) => {
+        setDogtionary(data);
+        setShowDogtionary(true);
+      })
+      .catch((err) => {
+        console.error('Failed to get dogtionary words', err)
+      });
   }
 
   const handleCloseWord = () => setShowWord(false);
+  const handleCloseDogtionary = () => setShowDogtionary(false);
 
   useEffect(() => {
     getDog();
@@ -341,9 +352,11 @@ function Dog(props) {
                       return (
                         <div key={i}>
                           <em>{ meaning.partOfSpeech }</em>
-                          {meaning.definitions.map((def, i) => {
-                            return <p key={i}>{ `${i + 1}: ${def}` }</p>;
-                          })}
+                          <ol>
+                            {meaning.definitions.map((def, i) => {
+                              return <li key={i}>{ `${def}` }</li>;
+                            })}
+                          </ol>
                         </div>
                       )
                     })}
@@ -357,7 +370,45 @@ function Dog(props) {
               </Modal.Footer>
             </Modal>
 
-            <Button variant='primary'>{`${dog.name}'s Dogtionary`}</Button>
+            <Button variant='primary' onClick={openDogtionary}>
+              {`${dog.name}'s Dogtionary`}
+            </Button>
+            <Modal
+              show={showDogtionary}
+              onHide={handleCloseDogtionary}
+              scrollable={true}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>{`${dog.name}'s Dogtionary`}</Modal.Title>
+              </Modal.Header>
+                <Modal.Body>
+                  { dogtionary.map((word, i) => {
+                    return (
+                      <Modal.Dialog key={`${i}`}>
+                        <h2>{ word.word }</h2>
+                        <p>{ word.phonetic }</p>
+                        {word.meanings.map((meaning, i) => {
+                          return (
+                            <div key={i}>
+                              <em>{ meaning.partOfSpeech }</em>
+                              <ol>
+                                {meaning.definitions.map((def, i) => {
+                                  return <li key={i}>{ `${def}` }</li>;
+                                })}
+                              </ol>
+                            </div>
+                          )
+                        })}
+                      </Modal.Dialog>
+                    )
+                  })
+                  }
+
+                </Modal.Body>
+              <Modal.Footer>
+                <Button variant='secondary' onClick={handleCloseDogtionary}>Close</Button>
+              </Modal.Footer>
+            </Modal>
           </div>
         </Card.Body>
       </div>
