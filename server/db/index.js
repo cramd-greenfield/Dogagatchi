@@ -50,32 +50,26 @@ const dogSchema = new mongoose.Schema({
   walkDeadline: Date, // timers
   medicineDeadline: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  words: [
-    {
-      word: String,
-      phonetic: String,
-      meanings: [{ partOfSpeech: String, definitions: [String] }],
-      definition: String,
-      favorite: Boolean,
-      used: Boolean,
-    },
-  ],
-  groom: Boolean,
+  isGroomed: Boolean, 
   activities: [String],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
 
-const groomSchema = new mongoose.Schema({
-  isSubscribed: Boolean,
-  cost: Number,
-  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
+const wordSchema = new mongoose.Schema({
+  word: String,
+  phonetic: String,
+  meanings: [{ partOfSpeech: String, definitions: [String] }],
+  dogtionary: Boolean,
+  favorite: Boolean,
+  used: Boolean,
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog'},
 });
 
-const Groom = mongoose.model('Groom', groomSchema);
+const Word = mongoose.model('Word', wordSchema);
 
 module.exports = {
-  Groom,
+  Word,
   User,
   Dog,
 };

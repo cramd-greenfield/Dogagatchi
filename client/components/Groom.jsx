@@ -1,127 +1,199 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, ProgressBar, Card, Form } from 'react-bootstrap';
 import axios from 'axios';
-import Button from 'react-bootstrap/Button';
-import React, { useState, useEffect } from 'react';
-import { Card, Image, Form, Carousel } from 'react-bootstrap';
-import Dog from './Dog.jsx';
+import barkSound from '../../server/barking-123909.mp3';
 
-function Groom(props) {
-  const [groomShop, setShop] = useState(false);
-  const [dogView, setDogView] = useState('');
-  const [breeds, setList] = useState([]);
+const Groom = () => {
+  const [dog, setDog] = useState([]);
+  const [hungry, setHunger] = useState(false);
+  const [happy, setHappy] = useState(true);
+  const [groomed, setGroomed] = useState([]);
+  const [feedStatus, setFeedStatus] = useState('');
+  const [walkStatus, setWalkStatus] = useState('');
+  const [feedTimer, setFeedTimer] = useState(0);
+  const [walkTimer, setWalkTimer] = useState(0);
+  const [groom, setGroom] = useState(false);
+
   const user = JSON.parse(sessionStorage.getItem('user'));
-  const [userId, setUserId] = useState(user._id);
-  /***************Test******************/
-  const { groom, setUser, setCoins } = props;
-  const [purchaseText, setPurchaseText] = useState('');
-  const [index, setIndex] = useState(0);
 
-  const handleSelect = (selectedIndex) => {
-    setIndex(selectedIndex);
-  };
+  const hungryRef = useRef(null);
+  const happyRef = useRef(null);
 
-  //put request to add meal to user's meal array and subtract coins from user's coinCount
-  const subscribe = () => {
-    const newCoinCount = user.coinCount - groom.cost;
-    if (newCoinCount < 0) {
-      setPurchaseText(
-        'Sorry! You do not have enough tokens. Head over to Pooch Picker to get more!'
-      );
-    } else {
-      axios
-        .put(`/user/meals/${props.user._id}`, {
-          update: {
-            type: 'subscribe',
-          },
-          meals: {
-            meal: props.meal,
-          },
-          coinCount: {
-            newCount: newCoinCount,
-          },
-        })
-        .then(({ data }) => {
-          setUser(data._id);
-          setPurchaseText(
-            `Awesome! You bought your pup some delicious ${meal.name} and now have ${data.coinCount} tokens!`
-          );
-          setCoins(data.coinCount);
-        })
-        .then(() => {
-          console.log('next');
-          setTimeout(() => setPurchaseText(''), 3000);
-        })
-        .catch((err) => console.log('buyMeal client ERROR:', err));
-    }
-  };
-
-  const getDogs = () => {
+  const getDog = () => {
     axios
-      .get(`/groom/${userId}`)
-      .then(({ data }) => {
-        setList(data.breeds);
-        console.log(data);
-      })
+      .get(`/groom/${dog._id}`)
+      .then(({ data }) => setDog(data))
       .catch((err) => {
         console.error(err);
       });
   };
 
+  const upgradeDog = () => {
+    axios
+      .put(`dog/${dog._id}`, { status })
+      .then(getDog())
+      .then(() => {
+        axios.put(`user/meals/${user._id}`, {}).then(() => getGroomedDogs());
+      })
+      .catch((err) => console.error('feed dog meal ERROR:', err));
+  };
+
+  const subscribe = () => {
+    if (coins >= 200) {
+      axios
+        .patch(`/groom/${dog._id}`, {
+          isGroomed: groomed,
+        })
+        .then(({ data }) => {
+          setCoins(data.coinCount);
+        });
+      getDog();
+      setDog([]);
+      setGroomed(true);
+    } else {
+      alert('Not enough coins!');
+    }
+    setShop(false);
+  };
+
   useEffect(() => {
-    getDogs();
-  }, []);
+    getDog();
+  }, [happy, hungry]);
+
+  useEffect(() => {
+    const x = setInterval(() => {
+      const now = new Date().getTime();
+
+      const feedTimer = ((Date.parse(dog.feedDeadline) - now) / 86400000) * 100;
+      const walkTimer = ((Date.parse(dog.walkDeadline) - now) / 86400000) * 100;
+
+      setFeedTimer(feedTimer);
+      setWalkTimer(walkTimer);
+
+      if (feedTimer < 25) {
+        setFeedStatus('danger');
+        if (hungryRef.current !== true) {
+          setHunger(true);
+          hungryRef.current = hungry;
+        }
+      } else if (feedTimer < 50) {
+        setFeedStatus('warning');
+        if (hungryRef.current !== true) {
+          setHunger(true);
+          hungryRef.current = hungry;
+        }
+      } else {
+        setFeedStatus('success');
+        if (hungryRef.current !== false) {
+          setHunger(false);
+          hungryRef.current = hungry;
+        }
+      }
+
+      if (walkTimer < 25) {
+        setWalkStatus('danger');
+        if (happyRef.current !== false) {
+          setHappy(false);
+          happyRef.current = happy;
+        }
+      } else if (walkTimer < 50) {
+        setWalkStatus('warning');
+        if (happyRef.current !== false) {
+          setHappy(false);
+          happyRef.current = happy;
+        }
+      } else {
+        setWalkStatus('success');
+        if (happyRef.current !== true) {
+          setHappy(true);
+          happyRef.current = happy;
+        }
+      }
+    }, 1000);
+    return () => clearInterval(x);
+  }, [happy, hungry, dog]);
 
   return (
-    <div>
+    <Card
+      variant='warning'
+      className='d-flex flex-row m-4 card text-white bg-warning mb-3'
+    >
       <div
-        style={{
-          display: 'grid',
-          // gridTemplateColumns: 'auto auto',
-        }}
+        className='d-flex flex-column justify-content-center align-items-center align-self-center'
+        style={{ width: '250px', height: '250px' }}
       >
-        <Form>
-          <Form.Group>
-            <Form.Label>Which Dog would you like to sign up?</Form.Label>
-          </Form.Group>
-          {/* <Form.Group> */}
-          <Card>
-            <Carousel
-              // style={{ width: '500px', height: '500px' }}
-              slide={false}
-              interval={null}
-              indicators={false}
-              activeIndex={index}
-              onSelect={handleSelect}
-            >
-              {breeds.map((dog, idx) => (
-                <Carousel.Item
-                  onChange={() => setDogView(dog)}
-                  dog={dog}
-                  key={`${dog}-${idx}`}
-                >
-                  <img src={dog} style={{ width: '250px' }} />
-                </Carousel.Item>
-              ))}
-            </Carousel>
-          </Card>
-          <Carousel.Item style={{ width: '300px', height: '300px' }}>
-            <Image
-              src={dogView}
-              alt={setDogView[breeds[0]]}
-              fluid
-              // style={{ width: 300, height: 300 }}
-            />
-          </Carousel.Item>
-          {/* </Form.Group> */}
-          <Form.Group>
-            <Form.Label></Form.Label>
-            <Button variant='warning' type='submit' onClick={() => subscribe()}>
-              💎 200 Coins 💎
-            </Button>
-          </Form.Group>
-        </Form>
+        <Card.Img
+          src={dog.img}
+          alt='Sorry, your dog is in another kennel.'
+          className='p-4'
+        />
+
+        <Button variant='warning' onClick={() => subscribe}>
+          💎 Groom 💎
+        </Button>
+        <Form.Label>200 Coins!</Form.Label>
       </div>
-    </div>
+      <div className='d-flex flex-column justify-content-center align-items-center w-100'>
+        <Card.Title className='pt-2'>{dog.name}</Card.Title>
+        <Card.Body className='w-100'>
+          <div className='dog-status'>
+            <ProgressBar
+              animated={true}
+              striped
+              variant='warning'
+              now={feedTimer}
+              label='FAVORITE'
+              style={{ height: '35px' }}
+            />
+            {hungry ? (
+              <Button
+                className='w-100 mx-0'
+                variant='info'
+                onClick={() => handleClick('feed')}
+              >
+                🍖
+              </Button>
+            ) : (
+              <Button
+                className='w-100 mx-0'
+                variant='info'
+                onClick={() => handleClick('bark')}
+              >
+                🦴
+              </Button>
+            )}
+            <ProgressBar
+              animated={true}
+              striped
+              variant='warning'
+              now={walkTimer}
+              label='FAVORITE'
+              style={{ height: '35px' }}
+            />
+
+            {groom ? (
+              <DropdownButton title='Feed from Pantry!'>
+                {groom.map((dog) => (
+                  <Dropdown.Item
+                    key={dog._id}
+                    onClick={(e) => {
+                      setGroom(e.target.value);
+                    }}
+                  >
+                    {meal.name}
+                  </Dropdown.Item>
+                ))}
+              </DropdownButton>
+            ) : (
+              <Form.Label>
+                Visit Bone Appétit Café to buy your first meal!
+              </Form.Label>
+            )}
+          </div>
+        </Card.Body>
+      </div>
+    </Card>
   );
-}
+};
 
 export default Groom;

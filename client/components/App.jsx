@@ -13,8 +13,8 @@ import NavBar from './Navbar.jsx';
 import Restaurant from './Restaurant.jsx';
 import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
+import Activity from './Activity.jsx';
 import GetWellCenter from './GetWellCenter.jsx';
-import GroomShop from './GroomShop.jsx';
 
 function App() {
   return (
@@ -38,6 +38,15 @@ function App() {
                 <div>
                   <NavBar />
                   <Quiz />
+                </div>
+              }
+            />
+            <Route
+              path='/activity'
+              element={
+                <div>
+                  <NavBar />
+                  <Activity />
                 </div>
               }
             />
@@ -69,22 +78,13 @@ function App() {
               }
             />
             <Route
-              path='/groomer'
+              path='/getwellcenter'
               element={
                 <div>
                   <NavBar />
-                  <GroomShop />
+                  <GetWellCenter />
                 </div>
               }
-            />
-            <Route 
-              path='/getwellcenter' 
-               element={
-                 <div>
-                  <NavBar/>
-                  <GetWellCenter/>
-                 </div>
-               }
             />
             <Route
               path='/about'

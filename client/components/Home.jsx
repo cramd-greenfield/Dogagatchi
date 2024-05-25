@@ -22,11 +22,11 @@ const Home = () => {
         <Link to='/quiz'>
           <Button className='boot-button'>Pooch Picker 🤔</Button>
         </Link>
+        <Link to="/activity">
+          <Button className="boot-button">Activities ✨</Button>
+        </Link>
         <Link to='/restaurant'>
           <Button className='boot-button'>Bone Appetite Cafe 🍽️</Button>
-        </Link>
-        <Link to='/groomer'>
-          <Button className='boot-button'>Groom Shop ✂️</Button>
         </Link>
         <Link to='/getwellcenter'>
           <Button className='boot-button'>Get Well Center 💉</Button>
