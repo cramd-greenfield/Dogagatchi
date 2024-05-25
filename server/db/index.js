@@ -28,6 +28,9 @@ const userSchema = new mongoose.Schema({
       fullTime: String,
     },
   ],
+  activities: [
+    String
+],
   img: String,
 });
 // creates user docs in the db
@@ -47,9 +50,6 @@ const dogSchema = new mongoose.Schema({
       used: Boolean,
     }
   ],
-  activities: [
-      String
-  ]
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
