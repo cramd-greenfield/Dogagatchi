@@ -47,6 +47,15 @@ router.get('/meals/:userId', (req, res) => {
         .catch((err) => console.error('meals put req server ERROR:', err))
 })
 
+router.get('/medicines/:userId', (req, res) => {
+    const { userId } = req.params;
+    User.findById(userId)
+        .then((user) => {
+            res.status(200).send(user)
+        })
+        .catch((err) => console.error('medicines put req server ERROR:', err))
+})
+
 //GET USER BY USER ID
 
 router.get('/:userId', (req, res) => {

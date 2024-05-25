@@ -53,6 +53,7 @@ function Dog(props) {
     axios
       .get(`/user/meals/${userIdParam}`)
       .then(({ data }) => {
+      
         const sortedMeals = data.meals.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );
@@ -66,6 +67,7 @@ function Dog(props) {
     axios
       .get(`/user/medicines/${userIdParam}`)
       .then(({ data }) => {
+        console.log('MEDICINES DATA', data)
         const sortedMedicines = data.medicines.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );

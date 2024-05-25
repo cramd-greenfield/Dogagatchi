@@ -28,6 +28,15 @@ const userSchema = new mongoose.Schema({
       fullTime: String,
     },
   ],
+  medicines: [
+    {
+      name: String,
+      image: String,
+      idMedicine: Number,
+      cost: Number,
+      fullTime: String,
+    },
+  ],
   img: String,
 });
 // creates user docs in the db
