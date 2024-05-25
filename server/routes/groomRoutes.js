@@ -24,17 +24,21 @@ router.get('/:userId', (req, res) => {
 
 //get all groomed dogs
 router.get('/member/:userId', (req, res) => {
-  const { dogId, userId } = req.params;
-  console.log(dogId);
-  Dog.find({ id: dogId })
-    .then(() => {
-      User.findById(userId)
-        .then(({ groomed }) => {
-          res.status(200).send({ groomed });
-        })
-        .catch((err) => {
-          console.error('Owner does not have any dogs:', err);
-        });
+  const { isGroomed, userId } = req.params;
+  console.log(userId);
+  Dog.find({ isGroomed })
+    .then((groomed) => {
+      if (groomed) {
+        User.findById(userId)
+          .then(({ groomed }) => {
+            res.status(200).send({ groomed });
+          })
+          .catch((err) => {
+            console.error('Owner does not have any dogs:', err);
+          });
+      } else {
+        console.log('Owner does not have any Groomed Dogs');
+      }
     })
     .catch((err) => {
       console.error('failed to GET dog by userId', err);
@@ -48,7 +52,6 @@ router.patch('/:dogId', (req, res) => {
   const { dogId } = req.params;
   const status = new Date('3000-12-31T23:59:00Z');
 
-  console.log(status);
   Dog.findByIdAndUpdate(dogId, {
     $set: { isGroomed: true, feedDeadline: status, walkDeadline: status },
   })
