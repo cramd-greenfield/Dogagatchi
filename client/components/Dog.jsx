@@ -103,7 +103,7 @@ function Dog(props) {
                           // (dogToFeedObj, mealToFeedObj) 
   const giveMedicine = (dogToGiveMeds, medsToGiveObj) => {
     const status = {
-      feedDeadline: new Date(
+      medicineDeadline: new Date(
         new Date(dogToGiveMeds.medicineDeadline).getTime() + 24 * 60 * 60 * 1000
       ),
 
@@ -161,7 +161,7 @@ function Dog(props) {
         alert("Not enough coins!");
       } else if (e === "medicine" && coins >= 1) {
         setHealth(false);
-        medicineRef.current = sick;
+        medicineRef.current = health;
         const medicineDeadline = Date.parse(dog.medicineDeadline) + 12 * 60 * 60 * 1000;
         status.medicineDeadline = medicineDeadline;
         setMedicineTimer(medicineDeadline);

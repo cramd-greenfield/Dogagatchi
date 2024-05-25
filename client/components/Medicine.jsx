@@ -9,15 +9,15 @@ function Medicine(props) {
   
   
   const buyMedicine = () => {
-    const newCoinCount = user.coinCount - meal.cost
+    const newCoinCount = user.coinCount - medicine.cost
     if (newCoinCount < 0) {
       setPurchaseText('Sorry! You do not have enough tokens. Head over to Pooch Picker to get more chedda!')
     } else {
-      axios.put(`/user/medicine/${props.user._id}`, {
+      axios.put(`/user/medicines/${props.user._id}`, {
         update: {
           type: 'buyMedicine'
         },
-        medicine: {
+        medicines: {
           medicine: props.medicine
         },
         coinCount: {
