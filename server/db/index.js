@@ -29,7 +29,6 @@ const userSchema = new mongoose.Schema({
     },
   ],
   img: String,
-  groomed: [String], // Array of dogs that are subscribed to grooms
 });
 // creates user docs in the db
 const User = mongoose.model('User', userSchema);
