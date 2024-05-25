@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import Dog from './Dog.jsx';
-import Grooms from './Grooms.jsx';
 
 function Kennel(props) {
   const user = JSON.parse(sessionStorage.getItem('user'));
@@ -46,7 +45,6 @@ function Kennel(props) {
                     dogs={dogs}
                     // setDogs={setDogs}
                   />
-                  <Grooms dogs={dogs} />
                 </div>
               );
             })
