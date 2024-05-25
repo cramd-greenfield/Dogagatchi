@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const { Dog } = require('../db/index');
+const { Dog, Word } = require('../db/index');
 const { RANDOM_WORD_KEY } = require('../config');
 
 // **************** GET ROUTES ********************
@@ -65,33 +65,30 @@ router.post('/:dogId', (req, res) => {
             word,
             phonetic: data[0].phonetic,
             meanings: defs,
+            dogtionary: false,
             favorite: false,
             used: false,
+            dog: dogId
           }
-          console.log('wordObj', wordObj);
 
-          // add word to dog
-          Dog.findByIdAndUpdate(dogId, {
-            $push: { words: wordObj },
-          }, { returnDocument: 'after' })
-            .then((dog) => {
-              const { data } = dog;
-              console.log('dog', dog.words[dog.words.length - 1])
-              res.status(201).send(dog.words[dog.words.length - 1]);
+          // add word to collection
+          Word.create(wordObj)
+            .then((wordObj) => {
+              res.status(201).send(wordObj);
             })
             .catch((err) => {
-              console.error('Failed to find dog', err);
+              console.error('Failed to add word to db', err);
               res.sendStatus(500);
             })
 
         })
-        .catch((err) => {
-          console.error('Failed to get definition', err);
+        .catch(() => {
+          console.error('Failed to get definition');
           res.sendStatus(500);
         })
     })
-    .catch((err) => {
-      console.error('Failed to get random word', err);
+    .catch(() => {
+      console.error('Failed to get random word');
       res.sendStatus(500);
     })
 
@@ -104,35 +101,39 @@ router.post('/:dogId', (req, res) => {
 router.patch('/:dogId/:updateWord', (req, res) => {
   const { dogId, updateWord } = req.params;
   console.log('wordId', updateWord);
-  const { wordObj, update } = req.body;
+  const { update } = req.body;
 
   // update favorite
   if (update.type === 'favorite') {
 
-    Dog.findById(dogId,
-      { '$set': { 'words.$[word].favorite': true } },
-      { 'arrayFilters': [ { word: updateWord }]}
-    )
-    .then((dog) => {
+    Dog.findById(dogId)
+      .then((dog) => {
 
-      // $set operator
-      // or use word object to replace/update with new boolean sent in req
-      //    would use an update object argument after dogId
-      dog.words.forEach((word) => {
-        if (word.word === updateWord) {
-          console.log('found');
-          console.log(word.favorite);
-          word['favorite'] = true;
+        for (let i = 0; i < dog.words.length; i++) {
+          if (dog.words[i].word === updateWord) {
+            dog.words[i].favorite = true;
+            return dog.words[i];
+          }
         }
 
       })
-
-      res.sendStatus(202);
-    })
-    .catch((err) => {
-      console.error('Failed to update word', err);
-      res.sendStatus(500);
-    })
+      .then((wordObj) => {
+        console.log('passed word obj', wordObj);
+        Dog.findByIdAndUpdate(dogId, {
+          $push: { words: wordObj },
+        }, { returnDocument: 'after' })
+          .then(() => {
+            res.sendStatus(202);
+          })
+          .catch((err) => {
+            console.error('Failed to find dog', err);
+            res.sendStatus(500);
+          })
+      })
+      .catch((err) => {
+        console.error('Failed to update word to favorite', err);
+        res.sendStatus(500);
+      })
   } else if (update.type === 'used') { // update used
 
   }

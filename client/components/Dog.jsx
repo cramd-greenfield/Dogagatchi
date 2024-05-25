@@ -308,7 +308,6 @@ function Dog(props) {
                     <h2>placeholder</h2>
                   )
                 }
-
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>
                   Close
