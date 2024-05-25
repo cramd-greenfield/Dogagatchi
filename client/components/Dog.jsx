@@ -378,7 +378,6 @@ function Dog(props) {
                 </Dropdown.Item>
               </DropdownButton>
             )}
-<<<<<<< HEAD
             {medicines ? (
               <DropdownButton title="Cure with Meds!">
                 {medicines.map((medicine) => (
@@ -400,7 +399,6 @@ function Dog(props) {
               </DropdownButton>
             )}
             
-=======
 
             <Button onClick={fetchAndShowWord}>
               Word of the Day!
@@ -441,7 +439,6 @@ function Dog(props) {
               </Modal.Footer>
             </Modal>
 
->>>>>>> dbdd0a5788482bd52fe17ded068e191c5e5ab466
           </div>
         </Card.Body>
       </div>
