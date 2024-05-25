@@ -13,8 +13,6 @@ import NavBar from './Navbar.jsx';
 import Restaurant from './Restaurant.jsx';
 import About from './About.jsx';
 import DeletedUser from './DeletedUser.jsx';
-import Activity from './Activity.jsx';
-import GetWellCenter from './GetWellCenter.jsx';
 
 function App() {
   return (
@@ -42,15 +40,6 @@ function App() {
               }
             />
             <Route
-              path='/activity'
-              element={
-                <div>
-                  <NavBar />
-                  <Activity />
-                </div>
-              }
-            />
-            <Route
               path='/user'
               element={
                 <div>
@@ -74,6 +63,15 @@ function App() {
                 <div>
                   <NavBar />
                   <Restaurant />
+                </div>
+              }
+            />
+            <Route
+              path='/getwellcenter'
+              element={
+                <div>
+                  <NavBar />
+                  <GetWellCenter />
                 </div>
               }
             />
