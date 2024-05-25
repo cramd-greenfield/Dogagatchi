@@ -36,6 +36,10 @@ function Dog(props) {
     getSignedInUserMeals(user._id);
   }, []);
 
+  useEffect(() => {
+    getSignedInUserMedicines(user._id);
+  }, []);
+
   const getDog = () => {
     axios
       .get(`/dog/id/${dog._id}`)
@@ -54,6 +58,19 @@ function Dog(props) {
         );
         //console.log('meals', sortedMeals)
         setMeals(sortedMeals);
+      })
+      .catch((err) => console.error("get signed in user ERROR", err));
+  };
+
+  const getSignedInUserMedicines = (userIdParam) => {
+    axios
+      .get(`/user/medicines/${userIdParam}`)
+      .then(({ data }) => {
+        const sortedMedicines = data.medicines.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+        //console.log('meals', sortedMeals)
+        setMedicines(sortedMedicines);
       })
       .catch((err) => console.error("get signed in user ERROR", err));
   };
@@ -87,7 +104,7 @@ function Dog(props) {
   const giveMedicine = (dogToGiveMeds, medsToGiveObj) => {
     const status = {
       feedDeadline: new Date(
-        new Date(dogToGiveMeds.feedDeadline).getTime() + 24 * 60 * 60 * 1000
+        new Date(dogToGiveMeds.medicineDeadline).getTime() + 24 * 60 * 60 * 1000
       ),
 
     };
@@ -103,7 +120,7 @@ function Dog(props) {
             },
             medicineToDelete: medsToGiveObj,
           })
-          .then(() => getSignedInUserMeals(user._id));
+          .then(() => getSignedInUserMedicines(user._id));
       })
       .catch((err) => console.error("feed dog meal ERROR:", err));
   };
@@ -223,24 +240,24 @@ function Dog(props) {
         setHealthStatus("danger");
         if (medicineRef.current !== true) {
           setHealth(true);
-          medicineRef.current = sick;
+          medicineRef.current = health;
         }
       } else if (medicineTimer < 50) {
         setHealthStatus("warning");
         if (medicineRef.current !== true) {
           setHealth(true);
-          medicineRef.current = sick;
+          medicineRef.current = health;
         }
       } else {
         setHealthStatus("success");
         if (medicineRef.current !== false) {
           setHealth(false);
-          medicineRef.current = sick;
+          medicineRef.current = health;
         }
       }
     }, 1000);
     return () => clearInterval(x);
-  }, [happy, hungry, dog]);
+  }, [happy, hungry, health, dog]);
 
   return (
     <Card className="d-flex flex-row m-4">
