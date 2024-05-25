@@ -1,21 +1,26 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const { Dog } = require('../db/index');
+const { Dog, Word } = require('../db/index');
 const { RANDOM_WORD_KEY } = require('../config');
 
 // **************** GET ROUTES ********************
 
 // GET WORDS BY DOG ID
 
-router.get('/', (req, res) => {
-  
-  // this route should get the all words from a specific dog
-  // the data sent in response will be used to populate the dogtionary
-  //
+router.get('/:dogId', (req, res) => {
+  const { dogId } = req.params;
 
+  // get all words associated with specific dog
+  Word.find({ dog: dogId })
+    .then((words) => {
+      res.status(200).send(words);
+    })
+    .catch((err) => {
+      console.error('Failed to get word from db', err);
+      res.sendStatus(500);
+    })
 
-  res.sendStatus(200);
 })
 
 // **************** POST ROUTES ********************
@@ -60,33 +65,30 @@ router.post('/:dogId', (req, res) => {
             word,
             phonetic: data[0].phonetic,
             meanings: defs,
+            dogtionary: false,
             favorite: false,
             used: false,
+            dog: dogId
           }
-          console.log('wordObj', wordObj);
 
-          // add word to dog
-          Dog.findByIdAndUpdate(dogId, {
-            $push: { words: wordObj },
-          }, { returnDocument: 'after' })
-            .then((dog) => {
-              const { data } = dog;
-              console.log('dog', dog.words[dog.words.length - 1])
-              res.status(201).send(dog.words[dog.words.length - 1]);
+          // add word to collection
+          Word.create(wordObj)
+            .then((wordObj) => {
+              res.status(201).send(wordObj);
             })
             .catch((err) => {
-              console.error('Failed to find dog', err);
+              console.error('Failed to add word to db', err);
               res.sendStatus(500);
             })
 
         })
-        .catch((err) => {
-          console.error('Failed to get definition', err);
+        .catch(() => {
+          console.error('Failed to get definition');
           res.sendStatus(500);
         })
     })
-    .catch((err) => {
-      console.error('Failed to get random word', err);
+    .catch(() => {
+      console.error('Failed to get random word');
       res.sendStatus(500);
     })
 
@@ -96,10 +98,30 @@ router.post('/:dogId', (req, res) => {
 
 // UPDATE WORD BY DOG ID
 
-router.put('/', (req, res) => {
+router.patch('/:wordId', (req, res) => {
+  const { wordId } = req.params;
+  console.log('wordId', wordId);
+  const { update, favUpdate, dogtionaryUpdate, usedUpdate } = req.body;
 
-  // this route should handle flipping the used boolean to true
-  // also handle marking word as a favorite
+  // update favorite
+  if (update.type === 'favorite') {
+
+    Word.findByIdAndUpdate(wordId, favUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
+
+  } else if (update.type === 'dogtionary') { // update dogtionary status
+
+    Word.findByIdAndUpdate(wordId, dogtionaryUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
+
+  } else if (update.type === 'used') [ // update used status
+
+    Word.findByIdAndUpdate(wordId, usedUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
+  ]
 
 })
 
@@ -107,10 +129,15 @@ router.put('/', (req, res) => {
 
 // DELETE WORD BY DOG ID
 
-router.delete('/', (req, res) => {
+router.delete('/:wordId', (req, res) => {
+  const { wordId } = req.params;
 
-  // this route should handle deleting a word from a specific
-  //    dog's dogtionary
+  Word.findByIdAndDelete(wordId)
+    .then(() => { res.sendStatus(202) })
+    .catch(() => {
+      console.error('Failed to delete word from db')
+      res.sendStatus(500);
+    });
 
 })
 
