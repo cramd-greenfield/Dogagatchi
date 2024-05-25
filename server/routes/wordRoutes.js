@@ -11,13 +11,13 @@ const { RANDOM_WORD_KEY } = require('../config');
 router.get('/:dogId', (req, res) => {
   const { dogId } = req.params;
 
-  // get all words from a specific dog
-  Dog.findById(dogId)
-    .then((dog) => {
-      res.status(200).send(dog.words)
+  // get all words associated with specific dog
+  Word.find({ dog: dogId })
+    .then((words) => {
+      res.status(200).send(words);
     })
     .catch((err) => {
-      console.error('Failed to get dog from db', err);
+      console.error('Failed to get word from db', err);
       res.sendStatus(500);
     })
 
@@ -144,22 +144,24 @@ router.patch('/:dogId/:updateWord', (req, res) => {
 
 // DELETE WORD BY DOG ID
 
-router.delete('/:dogId', (req, res) => {
-  const { dogId } = req.params;
-  const { wordObj } = req.body;
-  console.log('wordObj', wordObj)
+router.delete('/:wordId', (req, res) => {
+  const { wordId } = req.params;
 
   // delete word from dog
-  Dog.findByIdAndUpdate(dogId, {
-    $pull: { words: wordObj }
-  }, { returnDocument: 'after' })
-    .then((dog) => {
-      res.sendStatus(202);
-    })
-    .catch((err) => {
-      console.error('Failed to delete word', err);
-      res.sendStatus(500);
-    })
+  // Dog.findByIdAndUpdate(dogId, {
+  //   $pull: { words: wordObj }
+  // }, { returnDocument: 'after' })
+  //   .then((dog) => {
+  //     res.sendStatus(202);
+  //   })
+  //   .catch((err) => {
+  //     console.error('Failed to delete word', err);
+  //     res.sendStatus(500);
+  //   })
+
+  Word.findByIdAndDelete(wordId)
+    .then(() => { res.sendStatus(202) })
+    .catch(() => { console.error('Failed to delete word from db') });
 
 })
 
