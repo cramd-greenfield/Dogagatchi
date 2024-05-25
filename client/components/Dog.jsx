@@ -53,7 +53,7 @@ function Dog(props) {
         const sortedMeals = data.meals.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );
-        //console.log('meals', sortedMeals)
+
         setMeals(sortedMeals);
       })
       .catch((err) => console.error('get signed in user ERROR', err));
@@ -147,9 +147,11 @@ function Dog(props) {
     axios
       .post(`/words/${dog._id}`)
       .then(({ data }) => {
+      
         console.log('data recd from axios post');
         console.log('keys', Object.keys(data));
         console.log('data', data.meanings);
+
         setWord(data);
         setShowWord(true);
       })
@@ -315,6 +317,7 @@ function Dog(props) {
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
+
               {showWord ? (
                 <Modal.Body>
                   <h2>{word.word}</h2>
@@ -333,6 +336,28 @@ function Dog(props) {
               ) : (
                 <h2>placeholder</h2>
               )}
+
+                { showWord ? (
+                  <Modal.Body>
+                    <h2>{ word.word }</h2>
+                    <p>{ word.phonetic }</p>
+                    {word.meanings.map((meaning, i) => {
+                      return (
+                        <div key={i}>
+                          <em>{ meaning.partOfSpeech }</em>
+                          {meaning.definitions.map((def, i) => {
+                            return (
+                              <p key={i}>{ `${i + 1}: ${def}` }</p>
+                            )
+                          })}
+                        </div>
+                      )
+                    })}
+                  </Modal.Body>
+                  ) : (
+                    <h2>placeholder</h2>
+                  )
+                }
 
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>
