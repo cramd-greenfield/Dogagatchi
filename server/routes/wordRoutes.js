@@ -98,45 +98,30 @@ router.post('/:dogId', (req, res) => {
 
 // UPDATE WORD BY DOG ID
 
-router.patch('/:dogId/:updateWord', (req, res) => {
-  const { dogId, updateWord } = req.params;
-  console.log('wordId', updateWord);
-  const { update } = req.body;
+router.patch('/:wordId', (req, res) => {
+  const { wordId } = req.params;
+  console.log('wordId', wordId);
+  const { update, favUpdate, dogtionaryUpdate, usedUpdate } = req.body;
 
   // update favorite
   if (update.type === 'favorite') {
 
-    Dog.findById(dogId)
-      .then((dog) => {
+    Word.findByIdAndUpdate(wordId, favUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
 
-        for (let i = 0; i < dog.words.length; i++) {
-          if (dog.words[i].word === updateWord) {
-            dog.words[i].favorite = true;
-            return dog.words[i];
-          }
-        }
+  } else if (update.type === 'dogtionary') { // update dogtionary status
 
-      })
-      .then((wordObj) => {
-        console.log('passed word obj', wordObj);
-        Dog.findByIdAndUpdate(dogId, {
-          $push: { words: wordObj },
-        }, { returnDocument: 'after' })
-          .then(() => {
-            res.sendStatus(202);
-          })
-          .catch((err) => {
-            console.error('Failed to find dog', err);
-            res.sendStatus(500);
-          })
-      })
-      .catch((err) => {
-        console.error('Failed to update word to favorite', err);
-        res.sendStatus(500);
-      })
-  } else if (update.type === 'used') { // update used
+    Word.findByIdAndUpdate(wordId, dogtionaryUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
 
-  }
+  } else if (update.type === 'used') [ // update used status
+
+    Word.findByIdAndUpdate(wordId, usedUpdate)
+      .then(() => { res.sendStatus(202) })
+      .catch(() => { res.sendStatus(500)})
+  ]
 
 })
 
@@ -147,21 +132,12 @@ router.patch('/:dogId/:updateWord', (req, res) => {
 router.delete('/:wordId', (req, res) => {
   const { wordId } = req.params;
 
-  // delete word from dog
-  // Dog.findByIdAndUpdate(dogId, {
-  //   $pull: { words: wordObj }
-  // }, { returnDocument: 'after' })
-  //   .then((dog) => {
-  //     res.sendStatus(202);
-  //   })
-  //   .catch((err) => {
-  //     console.error('Failed to delete word', err);
-  //     res.sendStatus(500);
-  //   })
-
   Word.findByIdAndDelete(wordId)
     .then(() => { res.sendStatus(202) })
-    .catch(() => { console.error('Failed to delete word from db') });
+    .catch(() => {
+      console.error('Failed to delete word from db')
+      res.sendStatus(500);
+    });
 
 })
 
