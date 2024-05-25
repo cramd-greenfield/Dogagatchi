@@ -145,8 +145,11 @@ function Dog(props) {
   const fetchAndShowWord = () => {
     // request to /words/:dogId
     axios
-      .post(`/words/${dog._id}`)
+      .get(`/words/randomWord`)
       .then(({ data }) => {
+        console.log('data', data)
+        data.dog = dog._id;
+        console.log('word Obj', data);
         setWord(data);
         setShowWord(true);
       })
@@ -154,6 +157,20 @@ function Dog(props) {
         console.error(err);
       });
   };
+
+  const addWordToDogtionary = () => {
+    console.log('add to dogtionary');
+    // send POST request with word object
+    axios
+      .post('/words/dogtionary', {
+        wordObj: word,
+      })
+      .then(() => {
+        console.log('added to dogtionary');
+      })
+      .catch((err) => { console.error('Failed to add word to dogtionary', err) });
+  }
+
   const handleCloseWord = () => setShowWord(false);
 
   useEffect(() => {
@@ -308,7 +325,11 @@ function Dog(props) {
             )}
 
             <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-            <Modal show={showWord} onHide={handleCloseWord} scrollable={true}>
+            <Modal
+              show={showWord}
+              onHide={handleCloseWord}
+              scrollable={true}
+            >
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
@@ -331,9 +352,8 @@ function Dog(props) {
                     <h2>placeholder</h2>
                   )}
               <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseWord}>
-                  Close
-                </Button>
+                <Button variant='secondary' onClick={handleCloseWord}>Close</Button>
+                <Button variant='primary' onClick={addWordToDogtionary}>Add to Dogtionary!</Button>
               </Modal.Footer>
             </Modal>
 

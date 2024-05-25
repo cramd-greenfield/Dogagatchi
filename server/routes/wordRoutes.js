@@ -100,59 +100,6 @@ router.post('/dogtionary', (req, res) => {
       res.sendStatus(500);
     })
 
-  // get word from random word api
-//   axios
-//     .get(`https://api.api-ninjas.com/v1/randomword`, {
-//       headers: {
-//         'X-Api-Key': RANDOM_WORD_KEY,
-//       }
-//     })
-//     .then(({ data }) => {
-//       const { word } = data;
-
-//       axios
-//         .get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-//         .then(({ data }) => {
-
-//           const defs = data[0].meanings.map((meaning, i) => {
-
-//             // construct meaning object
-//             const dbMeaning = {
-//               partOfSpeech: meaning.partOfSpeech,
-//               definitions: []
-//             };
-
-//             // then insert definitions to it
-//             meaning.definitions.forEach((def) => {
-//               dbMeaning.definitions.push(def.definition);
-//             })
-
-//             return dbMeaning;
-
-//           })
-
-//           const wordObj = {
-//             word,
-//             phonetic: data[0].phonetic,
-//             meanings: defs,
-//             dogtionary: false,
-//             favorite: false,
-//             used: false,
-//             dog: dogId
-//           }
-
-
-//         })
-//         .catch(() => {
-//           console.error('Failed to get definition');
-//           res.sendStatus(500);
-//         })
-//     })
-//     .catch(() => {
-//       console.error('Failed to get random word');
-//       res.sendStatus(500);
-//     })
-
 })
 
 // **************** PUT/PATCH ROUTES ********************
