@@ -1,37 +1,48 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ListGroup, Table, Card, Col, Container, Row, Button, Modal } from "react-bootstrap";
+import {
+  ListGroup,
+  Table,
+  Card,
+  Col,
+  Container,
+  Row,
+  Button,
+  Modal,
+} from 'react-bootstrap';
 import NavBar from './Navbar.jsx';
-import DogShop from './DogShop.jsx'
+import DogShop from './DogShop.jsx';
 import Achievements from './Achievements.jsx';
 import Kennel from './Kennel.jsx';
+import Grooms from './Grooms.jsx';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios'
+import axios from 'axios';
 
 function User(props) {
-  const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState('');
   const [globalRank, setGlobalRank] = useState(0);
   const [dogCount, setDogCount] = useState(0);
   const [ownDogs, setOwnDogs] = useState(0);
   const [coins, setCoins] = useState(0);
-  const [color, setColor] = useState("#ade3e3");
+  const [color, setColor] = useState('#ade3e3');
   const [correctQuestionCount, setCorrectQuestionCount] = useState(0);
   const [dogs, setDogs] = useState([]);
-  const [showModal, setShowModal] = useState(false)
+  const [groomed, setGroomed] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
-  const userObj = JSON.parse(sessionStorage.getItem("user"));
+  const userObj = JSON.parse(sessionStorage.getItem('user'));
 
   useEffect(() => {
     axios
-      .get("/user/leaderboard/smartest")
+      .get('/user/leaderboard/smartest')
       .then(({ data }) => {
         const index = data.findIndex(
           (userData) => userData._id === userObj._id
         );
         setGlobalRank(index + 1);
       })
-      .catch((err) => console.error("getLeaders ERROR (client):", err));
+      .catch((err) => console.error('getLeaders ERROR (client):', err));
 
     setPage();
     axios.get(`/dog/users/${userObj._id}`).then((dogArr) => {
@@ -55,7 +66,19 @@ function User(props) {
       .get(`/dog/users/${userObj._id}`)
       .then(({ data }) => {
         setDogs(data.dogsArr);
-        setLoading(false)
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+  const getGroomed = () => {
+    axios
+      .get(`/groom/member/${userObj._id}`)
+      .then(({ data }) => {
+        console.log(data);
+        // setDogs(data.dogsArr);
+        setLoading(false);
       })
       .catch((err) => {
         console.error(err);
@@ -63,125 +86,123 @@ function User(props) {
   };
 
   const deleteUser = () => {
-
-    axios.delete(`/user/${userObj._id}`)
-    .then(() => {
-      axios.delete(`/dog/all/${userObj._id}`)
-      .then(() => console.log('deleted user dogs deleted'))
-      .catch((err) => console.error('deleted dogs', err))
-    })
-    .then(() => {
-      navigate('/deleted')
-    })
-    .then(() => setTimeout(() => navigate('/'), 4000))
-    .catch((err) => console.error('delete user ERROR', err))
-  }
+    axios
+      .delete(`/user/${userObj._id}`)
+      .then(() => {
+        axios
+          .delete(`/dog/all/${userObj._id}`)
+          .then(() => console.log('deleted user dogs deleted'))
+          .catch((err) => console.error('deleted dogs', err));
+      })
+      .then(() => {
+        navigate('/deleted');
+      })
+      .then(() => setTimeout(() => navigate('/'), 4000))
+      .catch((err) => console.error('delete user ERROR', err));
+  };
 
   const handleCloseModal = () => {
-    setShowModal(false)
-  }
+    setShowModal(false);
+  };
 
   return (
     <Container>
       <Row>
         <Col
           style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          <DogShop 
-          coins={coins}
-          setCoins={setCoins} />
+          <DogShop coins={coins} setCoins={setCoins} />
         </Col>
       </Row>
       <Row>
         <Col xs={4}>
-          <div className="user-stats">
-
-            {
-              loading ? (<h1></h1>):
-
-              globalRank === 1 ? (
-                <div>
-                  <h2 id="heady">🥇</h2>
-                 <h2 id="heady" className='shimmer'>{user.username}'s Kennel</h2>
-                </div>
-                 ) :
-            globalRank === 3 ?(
+          <div className='user-stats'>
+            {loading ? (
+              <h1></h1>
+            ) : globalRank === 1 ? (
               <div>
-                <h2 id="heady">🥉</h2>
-                <h2
-                  id="heady"
-                  className="shimmer"
-                >
+                <h2 id='heady'>🥇</h2>
+                <h2 id='heady' className='shimmer'>
                   {user.username}'s Kennel
                 </h2>
               </div>
-               ): globalRank === 2 ?(
-                <div>
-                  <h1 id="heady">🥈</h1>
-                 <h1 id="heady" className='shimmer'>{user.username}'s Kennel</h1>
-                </div>
-                 ): (
-                  <div>
-                    <h1>{user.username}'s Kennel</h1>
-                  </div>
-                   )
-               }
-            <Card
-              style={{ backgroundColor: "#4c5f63" }}
-            >
-              <Card.Header style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center"}}>
-
-                  {user.img ? <Card.Img style={{
-                maxWidth: "200px", 
-                maxHeight: "200px",
-                alignItems: "center",
-                border: 'white 5px solid'
-                }} src={user.img} /> : null
-                }
-              
-
+            ) : globalRank === 3 ? (
+              <div>
+                <h2 id='heady'>🥉</h2>
+                <h2 id='heady' className='shimmer'>
+                  {user.username}'s Kennel
+                </h2>
+              </div>
+            ) : globalRank === 2 ? (
+              <div>
+                <h1 id='heady'>🥈</h1>
+                <h1 id='heady' className='shimmer'>
+                  {user.username}'s Kennel
+                </h1>
+              </div>
+            ) : (
+              <div>
+                <h1>{user.username}'s Kennel</h1>
+              </div>
+            )}
+            <Card style={{ backgroundColor: '#4c5f63' }}>
+              <Card.Header
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                }}
+              >
+                {user.img ? (
+                  <Card.Img
+                    style={{
+                      maxWidth: '200px',
+                      maxHeight: '200px',
+                      alignItems: 'center',
+                      border: 'white 5px solid',
+                    }}
+                    src={user.img}
+                  />
+                ) : null}
               </Card.Header>
-      <Card.Header
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          fontWeight: "bold",
-          fontSize: "large",
-          backgroundColor: color
-        }}
-      >
-        {{coins} > 1 ? <p>Coin: {coins}</p> : <p>Coins: {coins}</p>}
-      </Card.Header>
-      
-        <Card.Header
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          fontWeight: "bold",
-          fontSize: "large",
-          backgroundColor: color
-        }}
-      >
-        Global Rank: #{globalRank}
-      </Card.Header>
+              <Card.Header
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 'large',
+                  backgroundColor: color,
+                }}
+              >
+                {{ coins } > 1 ? <p>Coin: {coins}</p> : <p>Coins: {coins}</p>}
+              </Card.Header>
 
               <Card.Header
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  fontSize: "large",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 'large',
+                  backgroundColor: color,
+                }}
+              >
+                Global Rank: #{globalRank}
+              </Card.Header>
+
+              <Card.Header
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 'large',
                   backgroundColor: color,
                 }}
               >
@@ -190,11 +211,11 @@ function User(props) {
 
               <Card.Header
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  fontSize: "large",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 'large',
                   backgroundColor: color,
                 }}
               >
@@ -203,11 +224,11 @@ function User(props) {
 
               <Card.Header
                 style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  fontWeight: "bold",
-                  fontSize: "large",
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  fontWeight: 'bold',
+                  fontSize: 'large',
                   backgroundColor: color,
                 }}
               >
@@ -216,33 +237,43 @@ function User(props) {
             </Card>
           </div>
 
-          <Achievements
-            user={user}
-            className="user-achievements"
-          />
+          <Achievements user={user} className='user-achievements' />
         </Col>
 
         <Col xs={8}>
-
-          {loading ? (<h1>Fetching...</h1>):
-            dogs.length === 0 ? (<h1>Start playing Pooch Picker to earn dogs to adopt!</h1>) : (
-        <div className="dogs">
-          <Kennel className="user-kennel" 
-          dogs={dogs}
-          getKennel={getKennel}
-          coins={coins}
-          setCoins={setCoins}
-          />
-        </div>)
-       }
+          {loading ? (
+            <h1>Fetching...</h1>
+          ) : dogs.length === 0 ? (
+            <h1>Start playing Pooch Picker to earn dogs to adopt!</h1>
+          ) : (
+            (
+              <div className='dogs'>
+                <Kennel
+                  className='user-kennel'
+                  dogs={dogs}
+                  getKennel={getKennel}
+                  coins={coins}
+                  setCoins={setCoins}
+                />
+              </div>
+            ) || (
+              <div className='groomed-dogs'>
+                <Grooms
+                  className='user-groomed'
+                  dogs={dogs}
+                  getGroomed={getGroomed}
+                  coins={coins}
+                  setCoins={setCoins}
+                />
+              </div>
+            )
+          )}
         </Col>
       </Row>
       <Row className='mt-3 mb-5'>
         <Col>
-        <Button
-            variant='danger'
-            onClick={() => setShowModal(true)}
-            >Delete Account
+          <Button variant='danger' onClick={() => setShowModal(true)}>
+            Delete Account
           </Button>
         </Col>
       </Row>
@@ -253,15 +284,14 @@ function User(props) {
         </Modal.Header>
         <Modal.Body>{`By deleting your account, you will lose ${coins} coins and ${ownDogs} dogs. If you are PAW-sitive you want to delete your account, click delete.`}</Modal.Body>
         <Modal.Footer>
-          <Button variant="danger" onClick={deleteUser}>
+          <Button variant='danger' onClick={deleteUser}>
             DELETE
           </Button>
-          <Button variant="primary" onClick={handleCloseModal}>
+          <Button variant='primary' onClick={handleCloseModal}>
             NEVERMIND
           </Button>
         </Modal.Footer>
       </Modal>
-
     </Container>
   );
 }

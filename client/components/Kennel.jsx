@@ -1,9 +1,9 @@
-import React from "react";
-import axios from "axios";
-import Dog from "./Dog.jsx";
+import React from 'react';
+import axios from 'axios';
+import Dog from './Dog.jsx';
 
 function Kennel(props) {
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const user = JSON.parse(sessionStorage.getItem('user'));
 
   const { dogs, setCoins, coins } = props;
 
@@ -11,7 +11,7 @@ function Kennel(props) {
     <div
       style={{
         height: 800,
-        overflow: "auto-hidden",
+        overflow: 'auto-hidden',
       }}
     >
       {Array.isArray(dogs) && dogs.length > 0
@@ -37,10 +37,7 @@ function Kennel(props) {
             })
             .map((dog) => {
               return (
-                <div
-                  className="item"
-                  key={dog._id}
-                >
+                <div className='item' key={dog._id}>
                   <Dog
                     coins={coins}
                     setCoins={setCoins}
@@ -51,7 +48,7 @@ function Kennel(props) {
                 </div>
               );
             })
-        : ""}
+        : ''}
     </div>
   );
 }
