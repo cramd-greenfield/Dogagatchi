@@ -29,6 +29,7 @@ function Dog(props) {
   const [showWord, setShowWord] = useState(false);
   const [dogtionary, setDogtionary] = useState([]);
   const [showDogtionary, setShowDogtionary] = useState(false);
+  const [added, setAdded] = useState(false);
   const [groomed, setGroomed] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -165,8 +166,18 @@ function Dog(props) {
       .post('/words/dogtionary', {
         wordObj: word,
       })
+      .then(() => setAdded(true))
       .catch((err) => { console.error('Failed to add word to dogtionary', err) });
   };
+
+  const removeWordFromDogtionary = (e) => {
+    const word = e.target.value;
+    // delete request to /:word
+    axios
+      .delete(`/words/${word}`)
+      .then(() => { openDogtionary() })
+      .catch((err) => { console.error('Failed to delete word', err) })
+  }
 
   const openDogtionary = () => {
     // get wordObjs from db in an array
@@ -366,7 +377,15 @@ function Dog(props) {
                   )}
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>Close</Button>
-                <Button variant='primary' onClick={addWordToDogtionary}>Add to Dogtionary!</Button>
+                { added ? (
+                  <Button variant='outline-primary'>
+                    Added!
+                  </Button>
+                ) : (
+                  <Button variant='primary' onClick={addWordToDogtionary}>
+                    Add to Dogtionary
+                  </Button>)
+                }
               </Modal.Footer>
             </Modal>
 
@@ -399,6 +418,13 @@ function Dog(props) {
                             </div>
                           )
                         })}
+                        <Button
+                          variant='secondary'
+                          value={word.word}
+                          onClick={removeWordFromDogtionary}
+                        >
+                          Remove
+                        </Button>
                       </Modal.Dialog>
                     )
                   })

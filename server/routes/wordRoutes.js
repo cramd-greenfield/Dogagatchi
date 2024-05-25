@@ -137,10 +137,10 @@ router.patch('/:wordId', (req, res) => {
 
 // DELETE WORD BY DOG ID
 
-router.delete('/:wordId', (req, res) => {
-  const { wordId } = req.params;
+router.delete('/:word', (req, res) => {
+  const { word } = req.params;
 
-  Word.findByIdAndDelete(wordId)
+  Word.findOneAndDelete({ word })
     .then(() => { res.sendStatus(202) })
     .catch(() => {
       console.error('Failed to delete word from db')
