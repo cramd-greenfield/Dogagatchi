@@ -5,6 +5,7 @@ import {
   Card,
   Dropdown,
   DropdownButton,
+  Modal,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -26,6 +27,8 @@ function Dog(props) {
   const [medicineTimer, setMedicineTimer] = useState(0);
   const [meals, setMeals] = useState([]);
   const [medicines, setMedicines] = useState([]); //useState hook that updates the medicines array
+  const [word, setWord] = useState({});
+  const [showWord, setShowWord] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
 
   const hungryRef = useRef(null);
@@ -180,6 +183,24 @@ function Dog(props) {
       bark.play();
     }
   };
+
+  const fetchAndShowWord = () => {
+    // request to /words/:dogId
+    axios
+      .post(`/words/${dog._id}`)
+      .then(({ data }) => {
+        console.log('data recd from axios post');
+        console.log('keys', Object.keys(data))
+        console.log('data', data.meanings)
+        setWord(data);
+        setShowWord(true);
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+
+  };
+  const handleCloseWord = () => setShowWord(false);
 
   useEffect(() => {
     getDog();
@@ -357,6 +378,7 @@ function Dog(props) {
                 </Dropdown.Item>
               </DropdownButton>
             )}
+<<<<<<< HEAD
             {medicines ? (
               <DropdownButton title="Cure with Meds!">
                 {medicines.map((medicine) => (
@@ -378,6 +400,48 @@ function Dog(props) {
               </DropdownButton>
             )}
             
+=======
+
+            <Button onClick={fetchAndShowWord}>
+              Word of the Day!
+            </Button>
+            <Modal show={showWord} onHide={handleCloseWord}>
+              <Modal.Header closeButton>
+                <Modal.Title>Word Of The Day</Modal.Title>
+              </Modal.Header>
+                { showWord ? (
+                  <Modal.Body>
+                    <h2>{ word.word }</h2>
+                    <p>{ word.phonetic }</p>
+                    {word.meanings.map((meaning) => {
+                      return (
+                        <>
+                          <em>{ meaning.partOfSpeech }</em>
+                          {meaning.definitions.map((def, i) => {
+                            return (
+                              <p>{ `${i + 1}: ${def}` }</p>
+                            )
+                          })}
+                        </>
+                      )
+                    })}
+                  </Modal.Body>
+                  ) : (
+                    <h2>placeholder</h2>
+                  )
+                }
+
+              <Modal.Footer>
+                <Button variant='secondary' onClick={handleCloseWord}>
+                  Close
+                </Button>
+                <Button variant='primary'>
+                  Add to Dogtionary!
+                </Button>
+              </Modal.Footer>
+            </Modal>
+
+>>>>>>> dbdd0a5788482bd52fe17ded068e191c5e5ab466
           </div>
         </Card.Body>
       </div>
