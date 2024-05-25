@@ -312,26 +312,6 @@ function Dog(props) {
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
-
-              {showWord ? (
-                <Modal.Body>
-                  <h2>{word.word}</h2>
-                  <p>{word.phonetic}</p>
-                  {word.meanings.map((meaning, i) => {
-                    return (
-                      <div key={`${i}`}>
-                        <em>{meaning.partOfSpeech}</em>
-                        {meaning.definitions.map((def, i) => {
-                          return <p key={`${i}`}>{`${i + 1}: ${def}`}</p>;
-                        })}
-                      </div>
-                    );
-                  })}
-                </Modal.Body>
-              ) : (
-                <h2>placeholder</h2>
-              )}
-
                 { showWord ? (
                   <Modal.Body>
                     <h2>{ word.word }</h2>
@@ -341,9 +321,7 @@ function Dog(props) {
                         <div key={i}>
                           <em>{ meaning.partOfSpeech }</em>
                           {meaning.definitions.map((def, i) => {
-                            return (
-                              <p key={i}>{ `${i + 1}: ${def}` }</p>
-                            )
+                            return <p key={i}>{ `${i + 1}: ${def}` }</p>;
                           })}
                         </div>
                       )
@@ -351,16 +329,15 @@ function Dog(props) {
                   </Modal.Body>
                   ) : (
                     <h2>placeholder</h2>
-                  )
-                }
-
+                  )}
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>
                   Close
                 </Button>
-                <Button variant='primary'>Add to Dogtionary!</Button>
               </Modal.Footer>
             </Modal>
+
+            <Button variant='primary'>{`${dog.name}'s Dogtionary`}</Button>
           </div>
         </Card.Body>
       </div>
