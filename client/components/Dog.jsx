@@ -104,6 +104,7 @@ function Dog(props) {
     setShop(false);
   };
   /************ Subscribe for Groom **********/
+
   const handleClick = (e) => {
     const status = {};
 
@@ -218,7 +219,7 @@ function Dog(props) {
   return (
     <Card className='d-flex flex-row m-4'>
       <div
-        className='d-flex flex-column justify-content-center align-items-center align-self-center'
+        className='d-flex flex-column justify-content-center align-items-center align-self-center '
         style={{ width: '250px', height: '250px' }}
       >
         <Card.Img
@@ -227,11 +228,12 @@ function Dog(props) {
           className='p-4'
         />
 
-        <Button type='submit' variant='warning' onClick={subscribe}>
+        <Button variant='warning' onClick={() => subscribe}>
           💎 Groom 💎
         </Button>
+        <Form.Label>200 Coins!</Form.Label>
       </div>
-      <div className='d-flex flex-column justify-content-center align-items-center w-100'>
+      <div className='d-flex flex-column justify-content-center align-items-center w-100 '>
         <Card.Title className='pt-2'>{dog.name}</Card.Title>
         <Card.Body className='w-100'>
           <div className='dog-status'>
