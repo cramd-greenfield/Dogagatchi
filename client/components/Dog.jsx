@@ -5,6 +5,8 @@ import {
   Card,
   Dropdown,
   DropdownButton,
+  ButtonGroup,
+  ToggleButton,
   Modal,
   Form,
 } from 'react-bootstrap';
@@ -33,6 +35,9 @@ function Dog(props) {
   const [medicines, setMedicines] = useState([]); //useState hook that updates the medicines array
   const [word, setWord] = useState({});
   const [showWord, setShowWord] = useState(false);
+  const [dogtionary, setDogtionary] = useState([]);
+  const [showDogtionary, setShowDogtionary] = useState(false);
+  const [added, setAdded] = useState(false);
   const [groomed, setGroomed] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -214,13 +219,10 @@ function Dog(props) {
   const fetchAndShowWord = () => {
     // request to /words/:dogId
     axios
-      .post(`/words/${dog._id}`)
+      .get(`/words/randomWord`)
       .then(({ data }) => {
-      
-        console.log('data recd from axios post');
-        console.log('keys', Object.keys(data));
-        console.log('data', data.meanings);
-
+        // add dog id to word object
+        data.dog = dog._id;
         setWord(data);
         setShowWord(true);
       })
@@ -228,7 +230,57 @@ function Dog(props) {
         console.error(err);
       });
   };
+
+  const addWordToDogtionary = () => {
+    // send POST request with word object
+    axios
+      .post('/words/dogtionary', {
+        wordObj: word,
+      })
+      .then(() => setAdded(true))
+      .catch((err) => { console.error('Failed to add word to dogtionary', err) });
+  };
+
+  const removeWordFromDogtionary = (e) => {
+    const word = e.target.value;
+    // delete request to /:word
+    axios
+      .delete(`/words/${word}`)
+      .then(() => { openDogtionary() })
+      .catch((err) => { console.error('Failed to delete word', err) })
+  }
+
+  const addFavoriteWord = (e) => {
+    // update word.favorite in db
+    const word = e.target.value;
+    axios
+      .patch(`/words/${word}`, {
+        update: {
+            type: 'favorite'
+        },
+        favUpdate: {
+            favorite: true
+        }
+    })
+    .then(() => { /* console.log('fav updated')*/ })
+    .catch((err) => { console.error('Failed to update favorite word', err)})
+  }
+
+  const openDogtionary = () => {
+    // get wordObjs from db in an array
+    axios
+      .get(`/words/dog/${dog._id}`)
+      .then(({ data }) => {
+        setDogtionary(data);
+        setShowDogtionary(true);
+      })
+      .catch((err) => {
+        console.error('Failed to get dogtionary words', err)
+      });
+  }
+
   const handleCloseWord = () => setShowWord(false);
+  const handleCloseDogtionary = () => setShowDogtionary(false);
 
   useEffect(() => {
     getDog();
@@ -434,30 +486,14 @@ function Dog(props) {
             
 
             <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-            <Modal show={showWord} onHide={handleCloseWord}>
+            <Modal
+              show={showWord}
+              onHide={handleCloseWord}
+              scrollable={true}
+            >
               <Modal.Header closeButton>
                 <Modal.Title>Word Of The Day</Modal.Title>
               </Modal.Header>
-
-              {showWord ? (
-                <Modal.Body>
-                  <h2>{word.word}</h2>
-                  <p>{word.phonetic}</p>
-                  {word.meanings.map((meaning) => {
-                    return (
-                      <>
-                        <em>{meaning.partOfSpeech}</em>
-                        {meaning.definitions.map((def, i) => {
-                          return <p>{`${i + 1}: ${def}`}</p>;
-                        })}
-                      </>
-                    );
-                  })}
-                </Modal.Body>
-              ) : (
-                <h2>placeholder</h2>
-              )}
-
                 { showWord ? (
                   <Modal.Body>
                     <h2>{ word.word }</h2>
@@ -466,25 +502,88 @@ function Dog(props) {
                       return (
                         <div key={i}>
                           <em>{ meaning.partOfSpeech }</em>
-                          {meaning.definitions.map((def, i) => {
-                            return (
-                              <p key={i}>{ `${i + 1}: ${def}` }</p>
-                            )
-                          })}
+                          <ol>
+                            {meaning.definitions.map((def, i) => {
+                              return <li key={i}>{ `${def}` }</li>;
+                            })}
+                          </ol>
                         </div>
                       )
                     })}
                   </Modal.Body>
                   ) : (
                     <h2>placeholder</h2>
-                  )
-                }
-
+                  )}
               <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseWord}>
-                  Close
-                </Button>
-                <Button variant='primary'>Add to Dogtionary!</Button>
+                <Button variant='secondary' onClick={handleCloseWord}>Close</Button>
+                { added ? (
+                  <Button variant='outline-primary'>
+                    Added!
+                  </Button>
+                ) : (
+                  <Button variant='primary' onClick={addWordToDogtionary}>
+                    Add to Dogtionary
+                  </Button>)
+                }
+              </Modal.Footer>
+            </Modal>
+
+            <Button variant='primary' onClick={openDogtionary}>
+              {`${dog.name}'s Dogtionary`}
+            </Button>
+            <Modal
+              show={showDogtionary}
+              onHide={handleCloseDogtionary}
+              scrollable={true}
+            >
+              <Modal.Header closeButton>
+                <Modal.Title>{`${dog.name}'s Dogtionary`}</Modal.Title>
+              </Modal.Header>
+                <Modal.Body>
+                  { dogtionary.map((word, i) => {
+                    return (
+                      <Modal.Dialog key={`${i}`}>
+                        <h2>{ word.word }</h2>
+                        <p>{ word.phonetic }</p>
+                        <ButtonGroup>
+                          <ToggleButton
+                            id="toggle-check"
+                            type="checkbox"
+                            variant="secondary"
+                            // checked={checked}
+                            value={word.word}
+                            onChange={addFavoriteWord}
+                          >
+                            ⭐️
+                          </ToggleButton>
+                        </ButtonGroup>
+                        {word.meanings.map((meaning, i) => {
+                          return (
+                            <div key={i}>
+                              <em>{ meaning.partOfSpeech }</em>
+                              <ol>
+                                {meaning.definitions.map((def, i) => {
+                                  return <li key={i}>{ `${def}` }</li>;
+                                })}
+                              </ol>
+                            </div>
+                          )
+                        })}
+                        <Button
+                          variant='secondary'
+                          value={word.word}
+                          onClick={removeWordFromDogtionary}
+                        >
+                          Remove
+                        </Button>
+                      </Modal.Dialog>
+                    )
+                  })
+                  }
+
+                </Modal.Body>
+              <Modal.Footer>
+                <Button variant='secondary' onClick={handleCloseDogtionary}>Close</Button>
               </Modal.Footer>
             </Modal>
           </div>

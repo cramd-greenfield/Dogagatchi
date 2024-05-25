@@ -8,7 +8,7 @@ const { RANDOM_WORD_KEY } = require('../config');
 
 // GET WORDS BY DOG ID
 
-router.get('/:dogId', (req, res) => {
+router.get('/dog/:dogId', (req, res) => {
   const { dogId } = req.params;
 
   // get all words associated with specific dog
@@ -23,12 +23,9 @@ router.get('/:dogId', (req, res) => {
 
 })
 
-// **************** POST ROUTES ********************
+// GET RANDOM WORD WITH DEFINITION
 
-// POST WORD BY DOG ID
-
-router.post('/:dogId', (req, res) => {
-  const { dogId } = req.params;
+router.get('/randomWord', (req, res) => {
 
   // get word from random word api
   axios
@@ -68,19 +65,10 @@ router.post('/:dogId', (req, res) => {
             dogtionary: false,
             favorite: false,
             used: false,
-            dog: dogId
+            // dog: dogId
           }
 
-          // add word to collection
-          Word.create(wordObj)
-            .then((wordObj) => {
-              res.status(201).send(wordObj);
-            })
-            .catch((err) => {
-              console.error('Failed to add word to db', err);
-              res.sendStatus(500);
-            })
-
+          res.status(200).send(wordObj);
         })
         .catch(() => {
           console.error('Failed to get definition');
@@ -94,31 +82,50 @@ router.post('/:dogId', (req, res) => {
 
 })
 
+
+// **************** POST ROUTES ********************
+
+// POST WORD BY DOG ID
+
+router.post('/dogtionary', (req, res) => {
+  const { wordObj } = req.body;
+
+  // add word to collection
+  Word.create(wordObj)
+    .then((wordObj) => {
+      res.status(201).send(wordObj);
+    })
+    .catch((err) => {
+      console.error('Failed to add word to db', err);
+      res.sendStatus(500);
+    })
+
+})
+
 // **************** PUT/PATCH ROUTES ********************
 
 // UPDATE WORD BY DOG ID
 
-router.patch('/:wordId', (req, res) => {
-  const { wordId } = req.params;
-  console.log('wordId', wordId);
+router.patch('/:word', (req, res) => {
+  const { word } = req.params;
   const { update, favUpdate, dogtionaryUpdate, usedUpdate } = req.body;
 
   // update favorite
   if (update.type === 'favorite') {
 
-    Word.findByIdAndUpdate(wordId, favUpdate)
+    Word.findOneAndUpdate({ word }, favUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
 
   } else if (update.type === 'dogtionary') { // update dogtionary status
 
-    Word.findByIdAndUpdate(wordId, dogtionaryUpdate)
+    Word.findOneAndUpdate({ word }, dogtionaryUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
 
   } else if (update.type === 'used') [ // update used status
 
-    Word.findByIdAndUpdate(wordId, usedUpdate)
+    Word.findOneAndUpdate({ word }, usedUpdate)
       .then(() => { res.sendStatus(202) })
       .catch(() => { res.sendStatus(500)})
   ]
@@ -129,10 +136,10 @@ router.patch('/:wordId', (req, res) => {
 
 // DELETE WORD BY DOG ID
 
-router.delete('/:wordId', (req, res) => {
-  const { wordId } = req.params;
+router.delete('/:word', (req, res) => {
+  const { word } = req.params;
 
-  Word.findByIdAndDelete(wordId)
+  Word.findOneAndDelete({ word })
     .then(() => { res.sendStatus(202) })
     .catch(() => {
       console.error('Failed to delete word from db')
