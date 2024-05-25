@@ -3,8 +3,7 @@ import { Button, Form, Image, Dropdown, DropdownButton } from 'react-bootstrap';
 import axios from 'axios';
 
 function DogShop(props) {
-  
-  const { coins, setCoins } = props 
+  const { coins, setCoins } = props;
 
   const [selectDogTrade, setDogTrade] = useState(false);
 
@@ -12,6 +11,7 @@ function DogShop(props) {
   const [breeds, setList] = useState([]);
   const [dogView, setDogView] = useState('');
   const [dogName, setDogName] = useState('');
+  const [groom, setGroom] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
   const [userId, setUserId] = useState(user._id);
 
@@ -23,7 +23,6 @@ function DogShop(props) {
     });
   }, []);
 
-
   // Placing trading functionality here
   const handleTrade = () => {
     // Starting with post request
@@ -31,29 +30,30 @@ function DogShop(props) {
     if (selectDogTrade && breeds.length > 0) {
       // Post request
       // Use axios
-      axios.put(`/dog/trade/${userId}`, {
-        dogToTrade: dogView,
-        selectDog: selectDogTrade,
-      })
-      .then(({data}) => {
-        // Use getDogs function
-        getDogs();
+      axios
+        .put(`/dog/trade/${userId}`, {
+          dogToTrade: dogView,
+          selectDog: selectDogTrade,
+        })
+        .then(({ data }) => {
+          // Use getDogs function
+          getDogs();
 
-        // Set dog trade to null
-        setDogTrade(false);
+          // Set dog trade to null
+          setDogTrade(false);
 
-        // Update the user's dogs
-        getDogs()
+          // Update the user's dogs
+          getDogs();
 
-        setCoins(data.coinCount)
-      })
-      .catch((err) => {
-        console.error(err);
-      })
+          setCoins(data.coinCount);
+        })
+        .catch((err) => {
+          console.error(err);
+        });
     } else {
-        // Else, console log please select dog
-        // Use alert method 
-        alert('Please select a dog for trade. Make sure you own one.');
+      // Else, console log please select dog
+      // Use alert method
+      alert('Please select a dog for trade. Make sure you own one.');
     }
   };
 
@@ -92,103 +92,144 @@ function DogShop(props) {
     }
     setShop(false);
   };
+  /************ Subscribe for Groom **********/
+  const subscribe = () => {
+    if (dogView === '' || dogName === '') {
+      alert('Fill all fields');
+    } else if (coins >= 185) {
+      axios
+        .post('/groom/member', {
+          name: dogName,
+          img: dogView,
+          owner: userId,
+        })
+        .then(({ data }) => {
+          setCoins(data.coinCount);
+        });
+      getDogs();
+      setDogs([]);
+      setList([]);
+    } else {
+      alert('Not enough coins!');
+    }
+    setShop(false);
+  };
+  /************ Subscribe for Groom **********/
 
-  return (    
+  return (
     <div>
-      {selectDogTrade ? "" : <Button onClick={() => setDogTrade(true)}>Trade a Dog!</Button>}
-        {selectDogTrade ? (
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "auto auto",
-          }}>
-            <Image 
-            src={dogView}
-            alt=""
-            rounded
-            style={{ width: 200 }}
-            />
-            <Form>
-              <Form.Group>
-                <Form.Label>Name</Form.Label>
-                <Form.Control 
-                 placeholder="Dog name"
-                 onChange={(e) => setDogName(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group>
-                <Dropdown>
-                  <Dropdown.Toggle
-                   style={{ width: "300px" }}
-                   onSelect={() => {
-                     handleSelect(dog);
-                   }}
-                   variant="success"
-                   id="dropdown-basic"
-                   >
-                    Select Dog
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu
-                    style={{ maxHeight: "300px", overflowY: "auto" }}>
-                    {breeds.map((dog, index) => (
-                     <Dropdown.Item
+      {selectDogTrade ? (
+        ''
+      ) : (
+        <Button onClick={() => setDogTrade(true)}>Trade a Dog!</Button>
+      )}
+      {selectDogTrade ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto auto',
+          }}
+        >
+          <Image src={dogView} alt='' rounded style={{ width: 200 }} />
+          <Form>
+            <Form.Group>
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                placeholder='Dog name'
+                onChange={(e) => setDogName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Dropdown>
+                <Dropdown.Toggle
+                  style={{ width: '300px' }}
+                  onSelect={() => {
+                    handleSelect(dog);
+                  }}
+                  variant='success'
+                  id='dropdown-basic'
+                >
+                  Select Dog
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{ maxHeight: '300px', overflowY: 'auto' }}
+                >
+                  {breeds.map((dog, index) => (
+                    <Dropdown.Item
                       onClick={() => setDogView(dog)}
                       eventKey={dog}
                       key={index}
-                      >
-                       <img src={dog} style={{ width: "250px" }}/>
-                       </Dropdown.Item>
-                       ))}
-                  </Dropdown.Menu>
-                </Dropdown>
-              </Form.Group>
-              <Form.Group>
-                <Form.Label>Trade a dog you own:</Form.Label>
-                <Button variant="primary" type="submit" onClick={() => handleTrade()}>
-                  Trade Dog
-                </Button>
-              </Form.Group>
-            </Form>
-          </div>
-        ) : (
-          ""
-        )}
+                    >
+                      <img src={dog} style={{ width: '250px' }} />
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Trade a dog you own:</Form.Label>
+              <Button
+                variant='primary'
+                type='submit'
+                onClick={() => handleTrade()}
+              >
+                Trade Dog
+              </Button>
+            </Form.Group>
+          </Form>
+        </div>
+      ) : (
+        ''
+      )}
 
-
-
-        {dogShop ? "" : <Button onClick={() => setShop(true)}>Purchase a Dog!</Button>}
-        {dogShop ? (
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "auto auto",
-            }}
-          >
-            <Image
-              src={dogView}
-              alt=""
-              rounded
-              style={{ width: 200 }}
-            />
-            <Form>
-              <Form.Group>
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                  placeholder="Dog name"
-                  onChange={(e) => setDogName(e.target.value)}
-                />
-              </Form.Group>
-              <Form.Group>
-                  <Dropdown>
-                    <Dropdown.Toggle style={{width: '300px'}} onSelect={() => {handleSelect(dog)}} variant="succes" id="dropdown-basic">Select Dog</Dropdown.Toggle>
-                    <Dropdown.Menu style={{maxHeight: '300px', overflowY: 'auto'}}>
-                    {breeds.map((dog, index) => (
-                      <Dropdown.Item onClick={() => setDogView(dog)} eventKey={dog} key={index}>
-                        <img src={dog} style={{width: '250px'}}/> 
-                      </Dropdown.Item>
-                    ))}
-                    </Dropdown.Menu>
-                  </Dropdown>
-                {/* <Form.Select onChange={(e) => setDogView(e.target.value)}>
+      {dogShop ? (
+        ''
+      ) : (
+        <Button onClick={() => setShop(true)}>Purchase a Dog!</Button>
+      )}
+      {dogShop ? (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto auto',
+          }}
+        >
+          <Image src={dogView} alt='' rounded style={{ width: 200 }} />
+          <Form>
+            <Form.Group>
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                placeholder='Dog name'
+                onChange={(e) => setDogName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Dropdown>
+                <Dropdown.Toggle
+                  style={{ width: '300px' }}
+                  onSelect={() => {
+                    handleSelect(dog);
+                  }}
+                  variant='succes'
+                  id='dropdown-basic'
+                >
+                  Select Dog
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{ maxHeight: '300px', overflowY: 'auto' }}
+                >
+                  {breeds.map((dog, index) => (
+                    <Dropdown.Item
+                      onClick={() => setDogView(dog)}
+                      eventKey={dog}
+                      key={index}
+                    >
+                      <img src={dog} style={{ width: '250px' }} />
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+              {/* <Form.Select onChange={(e) => setDogView(e.target.value)}>
  
                   <option>Choose Dog</option>
                   {breeds.map((dog, index) => {
@@ -211,6 +252,13 @@ function DogShop(props) {
                 onClick={() => handleSubmit()}
               >
                 Buy Dog
+              </Button>
+              <Button
+                type='submit'
+                variant='warning'
+                onClick={() => subscribe()}
+              >
+                💎 Groom 💎
               </Button>
             </Form.Group>
           </Form>
