@@ -5,30 +5,23 @@ import barkSound from '../../server/barking-123909.mp3';
 
 const Groom = () => {
   const [dog, setDog] = useState([]);
-  const [hungry, setHunger] = useState(false);
-  const [happy, setHappy] = useState(true);
   const [groomed, setGroomed] = useState([]);
 
   const user = JSON.parse(sessionStorage.getItem('user'));
 
+  const getGroomed = () => {
+    axios.get('/groom/member').then(({ data }) => {
+      setGroomed(data);
+      setDog(data);
+      console.log(data);
+    });
+  };
+  useEffect(() => {
+    getGroomed();
+  }, []);
+
   const hungryRef = useRef(null);
   const happyRef = useRef(null);
-
-  const getGroomedDogs = () => {
-    axios
-      .get(`/groom/member/${dog._id}`)
-      .then(({ data }) => {
-        setGroomed(data);
-        console.log(data);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  };
-
-  useEffect(() => {
-    getGroomedDogs();
-  }, [dog]);
 
   return (
     <Card
@@ -57,54 +50,6 @@ const Groom = () => {
               label='FAVORITE'
               style={{ height: '35px' }}
             />
-            <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-            <Modal show={showWord} onHide={handleCloseWord}>
-              <Modal.Header closeButton>
-                <Modal.Title>Word Of The Day</Modal.Title>
-              </Modal.Header>
-              {showWord ? (
-                <Modal.Body>
-                  <h2>{word.word}</h2>
-                  <p>{word.phonetic}</p>
-                  {word.meanings.map((meaning) => {
-                    return (
-                      <>
-                        <em>{meaning.partOfSpeech}</em>
-                        {meaning.definitions.map((def, i) => {
-                          return <p>{`${i + 1}: ${def}`}</p>;
-                        })}
-                      </>
-                    );
-                  })}
-                </Modal.Body>
-              ) : (
-                <h2>placeholder</h2>
-              )}
-              {showWord ? (
-                <Modal.Body>
-                  <h2>{word.word}</h2>
-                  <p>{word.phonetic}</p>
-                  {word.meanings.map((meaning, i) => {
-                    return (
-                      <div key={i}>
-                        <em>{meaning.partOfSpeech}</em>
-                        {meaning.definitions.map((def, i) => {
-                          return <p key={i}>{`${i + 1}: ${def}`}</p>;
-                        })}
-                      </div>
-                    );
-                  })}
-                </Modal.Body>
-              ) : (
-                <h2>placeholder</h2>
-              )}
-              <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseWord}>
-                  Close
-                </Button>
-                <Button variant='primary'>Add to Dogtionary!</Button>
-              </Modal.Footer>
-            </Modal>
           </div>
         </Card.Body>
       </div>
