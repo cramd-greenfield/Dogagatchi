@@ -27,7 +27,7 @@ function Dog(props) {
   const [meals, setMeals] = useState([]);
   const [word, setWord] = useState({});
   const [showWord, setShowWord] = useState(false);
-  const [groomed, setGroomed] = useState(false);
+  const [groomed, setGroomed] = useState([]);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
   const hungryRef = useRef(null);
@@ -88,20 +88,15 @@ function Dog(props) {
   /************ Subscribe for Groom **********/
   const subscribe = () => {
     if (coins >= 200) {
-      axios
-        .patch(`/groom/${dog._id}`, {
-          isGroomed: groomed,
-        })
-        .then(({ data }) => {
-          setCoins(data.coinCount);
-        });
+      axios.patch(`/groom/${dog._id}`).then(({ data }) => {
+        setCoins(data.coinCount);
+      });
       getDog();
       setDog([]);
-      setGroomed(true);
+      setGroomed([]);
     } else {
       alert('Not enough coins!');
     }
-    setShop(false);
   };
   /************ Subscribe for Groom **********/
 
@@ -147,7 +142,6 @@ function Dog(props) {
     axios
       .post(`/words/${dog._id}`)
       .then(({ data }) => {
-      
         console.log('data recd from axios post');
         console.log('keys', Object.keys(data));
         console.log('data', data.meanings);
@@ -230,7 +224,7 @@ function Dog(props) {
           className='p-4'
         />
 
-        <Button variant='warning' onClick={() => subscribe}>
+        <Button variant='warning' onClick={subscribe}>
           💎 Groom 💎
         </Button>
         <Form.Label>200 Coins!</Form.Label>
@@ -337,27 +331,24 @@ function Dog(props) {
                 <h2>placeholder</h2>
               )}
 
-                { showWord ? (
-                  <Modal.Body>
-                    <h2>{ word.word }</h2>
-                    <p>{ word.phonetic }</p>
-                    {word.meanings.map((meaning, i) => {
-                      return (
-                        <div key={i}>
-                          <em>{ meaning.partOfSpeech }</em>
-                          {meaning.definitions.map((def, i) => {
-                            return (
-                              <p key={i}>{ `${i + 1}: ${def}` }</p>
-                            )
-                          })}
-                        </div>
-                      )
-                    })}
-                  </Modal.Body>
-                  ) : (
-                    <h2>placeholder</h2>
-                  )
-                }
+              {showWord ? (
+                <Modal.Body>
+                  <h2>{word.word}</h2>
+                  <p>{word.phonetic}</p>
+                  {word.meanings.map((meaning, i) => {
+                    return (
+                      <div key={i}>
+                        <em>{meaning.partOfSpeech}</em>
+                        {meaning.definitions.map((def, i) => {
+                          return <p key={i}>{`${i + 1}: ${def}`}</p>;
+                        })}
+                      </div>
+                    );
+                  })}
+                </Modal.Body>
+              ) : (
+                <h2>placeholder</h2>
+              )}
 
               <Modal.Footer>
                 <Button variant='secondary' onClick={handleCloseWord}>
