@@ -11,6 +11,8 @@ require('dotenv').config();
 
 const userRoutes = require('./routes/userRoutes');
 const dogRoutes = require('./routes/dogRoutes');
+const groomRoutes = require('./routes/groomRoutes');
+const wordRoutes = require('./routes/wordRoutes');
 
 const app = express();
 const routeHandler = express.Router();
@@ -34,6 +36,9 @@ app.use(passport.session());
 
 routeHandler.use('/user', userRoutes);
 routeHandler.use('/dog', dogRoutes);
+routeHandler.use('/groom', groomRoutes);
+routeHandler.use('/words', wordRoutes);
+
 app.use('/', routeHandler);
 
 passport.use(
@@ -119,7 +124,7 @@ app.post('/auth/register', (req, res) => {
       User.create({
         username,
         password,
-        coinCount: 14,
+        coinCount: 400,
         questionCount: 0,
         img,
       }).then((user) => {
@@ -164,16 +169,16 @@ app.get('/api/activities', (req, res) => {
   axios
     .get('https://api.api-ninjas.com/v1/hobbies', {
       headers: {
-        'x-api-key': hobbiesApi
-      }
+        'x-api-key': hobbiesApi,
+      },
     })
-    .then(({data}) => {
+    .then(({ data }) => {
       console.log(data);
-      res.status(200).send(data)
+      res.status(200).send(data);
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
-    })
+    });
 });
 
 app.get('/*', (req, res) => {
@@ -182,7 +187,7 @@ app.get('/*', (req, res) => {
 
 // SERVER CONNECTION
 app.listen(port, () => {
-  console.log(`
-  Listening at: http://127.0.0.1:${port}
+  console.log(`\
+  Listening at:\n \n http://127.0.0.1:${port} \n\n http://localhost:${port}
   `);
 });
