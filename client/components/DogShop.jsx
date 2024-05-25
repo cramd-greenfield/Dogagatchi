@@ -23,38 +23,7 @@ function DogShop(props) {
   }, []);
 
 
-  // Placing trading functionality here
-  const handleTrade = () => {
-    // Starting with post request
-    // If selectDogTrade is truthy
-    if (selectDogTrade && breeds.length > 0) {
-      // Post request
-      // Use axios
-      axios.put(`/dog/trade/${userId}`, {
-        dogToTrade: dogView,
-        selectDog: selectDogTrade,
-      })
-      .then(({data}) => {
-        // Use getDogs function
-        getDogs();
-
-        // Set dog trade to null
-        setDogTrade(false);
-
-        // Update the user's dogs
-        getDogs()
-
-        setCoins(data.coinCount)
-      })
-      .catch((err) => {
-        console.error(err);
-      })
-    } else {
-        // Else, console log please select dog
-        // Use alert method 
-        alert('Please select a dog for trade. Make sure you own one.');
-    }
-  };
+  
 
   const getDogs = () => {
     axios
@@ -91,6 +60,35 @@ function DogShop(props) {
     }
     setShop(false);
   };
+
+// Placing trading functionality here
+const handleTrade = () => {
+  // If dog hasn't been selected
+  if (dogView === "") {
+    // Send message
+    alert("Select a dog");
+  } else {
+    // Use axios.put()
+    axios
+      .put(`/dog/trade/${userId}`, {
+        dogToTrade: dogView,
+        selectDog: selectDogTrade,
+      })
+      .then(({ data }) => {
+        // Update user's data after successful trade
+        setCoins(data.coinCount);
+        // Reset form and state
+        setDogName("");
+        setDogView("");
+        setDogTrade(false);
+      })
+      .catch((error) => {
+        console.error("Error trading dog:", error);
+        alert("Error trading dog. Please try again later.");
+      });
+  }
+};
+
 
   return (    
     <div>
@@ -142,7 +140,7 @@ function DogShop(props) {
               </Form.Group>
               <Form.Group>
                 <Form.Label>Trade a dog you own:</Form.Label>
-                <Button variant="primary" type="submit" onClick={() => handleTrade()}>
+                <Button variant="primary" type="submit" onClick={handleTrade}>
                   Trade Dog
                 </Button>
               </Form.Group>
