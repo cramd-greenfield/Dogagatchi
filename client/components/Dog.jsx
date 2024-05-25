@@ -291,16 +291,16 @@ function Dog(props) {
                   <Modal.Body>
                     <h2>{ word.word }</h2>
                     <p>{ word.phonetic }</p>
-                    {word.meanings.map((meaning) => {
+                    {word.meanings.map((meaning, i) => {
                       return (
-                        <>
+                        <div key={i}>
                           <em>{ meaning.partOfSpeech }</em>
                           {meaning.definitions.map((def, i) => {
                             return (
-                              <p>{ `${i + 1}: ${def}` }</p>
+                              <p key={i}>{ `${i + 1}: ${def}` }</p>
                             )
                           })}
-                        </>
+                        </div>
                       )
                     })}
                   </Modal.Body>
