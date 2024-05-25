@@ -37,6 +37,7 @@ function DogShop(props) {
   const handleSelect = (img) => {
     console.log('hit', img)
     setDogView(img)
+    selectDogTrade(true); // Change added here 
   }
 
   const handleSubmit = () => {
@@ -64,23 +65,27 @@ function DogShop(props) {
 // Placing trading functionality here
 const handleTrade = () => {
   // If dog hasn't been selected
-  if (dogView === "") {
-    // Send message
-    alert("Select a dog");
+   // Check if a dog has been selected for trading
+   if (dogView === "") {
+    alert("Select a dog to trade");
   } else {
-    // Use axios.put()
+    // Use axios.post() to trade the dog
     axios
-      .put(`/dog/trade/${userId}`, {
-        dogToTrade: dogView,
-        selectDog: selectDogTrade,
+      .post("/dog", {
+        name: dogName,
+        img: dogView,
+        owner: userId,
       })
       .then(({ data }) => {
         // Update user's data after successful trade
         setCoins(data.coinCount);
-        // Reset form and state
+        // Clear input fields
         setDogName("");
         setDogView("");
-        setDogTrade(false);
+        // Fetch updated list of dogs
+        getDogs();
+        // Optional: Provide feedback to the user
+        alert("Dog traded successfully!");
       })
       .catch((error) => {
         console.error("Error trading dog:", error);
