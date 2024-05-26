@@ -281,7 +281,10 @@ function Dog(props) {
       });
   };
 
-  const handleCloseWord = () => setShowWord(false);
+  const handleCloseWord = () => {
+    setShowWord(false);
+    setAdded(false);
+  };
   const handleCloseDogtionary = () => setShowDogtionary(false);
 
   useEffect(() => {
@@ -450,18 +453,16 @@ function Dog(props) {
                           <Modal.Dialog key={`${i}`}>
                             <h2>{ word.word }</h2>
                             <p>{ word.phonetic }</p>
-                            <ButtonGroup>
-                              <ToggleButton
-                                id="toggle-check"
-                                type="checkbox"
-                                variant="secondary"
-                                // checked={checked}
-                                value={word.word}
-                                onChange={addFavoriteWord}
-                              >
-                                ⭐️
-                              </ToggleButton>
-                            </ButtonGroup>
+                            <Button
+                              id="toggle-check"
+                              type="checkbox"
+                              variant="secondary"
+                              // checked={checked}
+                              value={word.word}
+                              onChange={addFavoriteWord}
+                            >
+                              ⭐️
+                            </Button>
                             {word.meanings.map((meaning, i) => {
                               return (
                                 <div key={i}>
@@ -677,18 +678,16 @@ function Dog(props) {
                           <Modal.Dialog key={`${i}`}>
                             <h2>{ word.word }</h2>
                             <p>{ word.phonetic }</p>
-                            <ButtonGroup>
-                              <ToggleButton
-                                id="toggle-check"
-                                type="checkbox"
-                                variant="secondary"
-                                // checked={checked}
-                                value={word.word}
-                                onChange={addFavoriteWord}
-                              >
-                                ⭐️
-                              </ToggleButton>
-                            </ButtonGroup>
+                            <Button
+                              id="toggle-check"
+                              type="checkbox"
+                              variant="secondary"
+                              // checked={checked}
+                              value={word.word}
+                              onChange={addFavoriteWord}
+                            >
+                              ⭐️
+                            </Button>
                             {word.meanings.map((meaning, i) => {
                               return (
                                 <div key={i}>
