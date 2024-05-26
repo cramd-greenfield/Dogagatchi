@@ -193,7 +193,7 @@ function Dog(props) {
             favorite: true
         }
     })
-    .then(() => { /* console.log('fav updated')*/ })
+    .then() // rerender to show updated favorites
     .catch((err) => { console.error('Failed to update favorite word', err)})
   }
 
