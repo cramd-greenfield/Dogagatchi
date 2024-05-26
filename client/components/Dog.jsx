@@ -37,6 +37,7 @@ function Dog(props) {
   const [dogtionary, setDogtionary] = useState([]);
   const [showDogtionary, setShowDogtionary] = useState(false);
   const [added, setAdded] = useState(false);
+  const [groom, setGroom] = useState([]);
   const [groomed, setGroomed] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
