@@ -6,6 +6,7 @@ function DogShop(props) {
   const { coins, setCoins } = props;
 
   const [selectDogTrade, setDogTrade] = useState(false);
+  const [ownedDogs, setOwnedDogs] = useState([]); // State to store the list of owned dogs
 
   const [dogShop, setShop] = useState(false);
   const [breeds, setList] = useState([]);
@@ -18,6 +19,8 @@ function DogShop(props) {
   useEffect(() => {
     setUserId(user._id);
     getDogs();
+    fetchOwnedDogs(); // Trigger the function to fetch owned dogs when component mounts
+
     axios.get(`/user/${user._id}`).then((userData) => {
       setCoins(userData.data[0].coinCount);
     });
@@ -30,6 +33,17 @@ function DogShop(props) {
       .then(({ data }) => setList(data.breeds))
       .catch((err) => {
         console.error(err);
+      });
+  };
+
+  // Function to fetch the list of user's owned dogs
+  const fetchOwnedDogs = () => {
+    axios.get(`/dog/users/${userId}`)
+      .then(({ data }) => {
+        setOwnedDogs(data.dogsArr); // Update the state with the fetched list of owned dogs
+      })
+      .catch((err) => {
+        console.error('Error fetching owned dogs:', err);
       });
   };
 
@@ -100,7 +114,7 @@ const handleTrade = () => {
       })
       .then(({ data }) => {
         // Update user's data after successful trade
-        setCoins(data.coinCount);
+        //setCoins(data.coinCount);
         // Clear input fields
         setDogName("");
         setDogView("");
@@ -120,46 +134,44 @@ const handleTrade = () => {
   return (    
 
     <div>
-      {selectDogTrade ? (
-        ''
-      ) : (
-        <Button onClick={() => setDogTrade(true)}>Trade a Dog!</Button>
-      )}
-      {selectDogTrade ? (
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'auto auto',
-          }}
-        >
-          <Image src={dogView} alt='' rounded style={{ width: 200 }} />
-          <Form>
-            <Form.Group>
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                placeholder='Dog name'
-                onChange={(e) => setDogName(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group>
-              <Dropdown>
-                <Dropdown.Toggle
-                  style={{ width: '300px' }}
-                  onSelect={() => {
-                    handleSelect(dog);
-                  }}
-                  variant='success'
-                  id='dropdown-basic'
-                >
-                  Select Dog
-                </Dropdown.Toggle>
-                <Dropdown.Menu
-                  style={{ maxHeight: '300px', overflowY: 'auto' }}
-                >
-                  {breeds.map((dog, index) => (
-                    <Dropdown.Item
-                      onClick={() => setDogView(dog)}
-                      eventKey={dog}
+      {selectDogTrade ? "" : <Button onClick={() => setDogTrade(true)}>Trade a Dog!</Button>}
+        {selectDogTrade ? (
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "auto auto",
+          }}>
+            <Image 
+            src={dogView}
+            alt=""
+            rounded
+            style={{ width: 200 }}
+            />
+            <Form>
+              <Form.Group>
+                <Form.Label>Name</Form.Label>
+                <Form.Control 
+                 placeholder="Dog name"
+                 onChange={(e) => setDogName(e.target.value)}
+                />
+              </Form.Group>
+              <Form.Group>
+                <Dropdown>
+                  <Dropdown.Toggle
+                   style={{ width: "300px" }}
+                   onSelect={() => {
+                     handleSelect(dog);
+                   }}
+                   variant="success"
+                   id="dropdown-basic"
+                   >
+                    Select Dog
+                  </Dropdown.Toggle>
+                  <Dropdown.Menu
+                    style={{ maxHeight: "300px", overflowY: "auto" }}>
+                     {ownedDogs.map((dog, index) => ( // Render the owned dogs as options for trading
+                     <Dropdown.Item
+                      onClick={() => setDogView(dog)} // Set the dog view to the selected dog's image
+                      eventKey={dog} // You might need to adjust this based on your dog object structure
                       key={index}
                       >
                        <img src={dog} style={{ width: "250px" }}/>
