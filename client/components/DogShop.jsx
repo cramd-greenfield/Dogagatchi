@@ -23,39 +23,6 @@ function DogShop(props) {
     });
   }, []);
 
-  // Placing trading functionality here
-  const handleTrade = () => {
-    // Starting with post request
-    // If selectDogTrade is truthy
-    if (selectDogTrade && breeds.length > 0) {
-      // Post request
-      // Use axios
-      axios
-        .put(`/dog/trade/${userId}`, {
-          dogToTrade: dogView,
-          selectDog: selectDogTrade,
-        })
-        .then(({ data }) => {
-          // Use getDogs function
-          getDogs();
-
-          // Set dog trade to null
-          setDogTrade(false);
-
-          // Update the user's dogs
-          getDogs();
-
-          setCoins(data.coinCount);
-        })
-        .catch((err) => {
-          console.error(err);
-        });
-    } else {
-      // Else, console log please select dog
-      // Use alert method
-      alert('Please select a dog for trade. Make sure you own one.');
-    }
-  };
 
   const getDogs = () => {
     axios
@@ -67,9 +34,10 @@ function DogShop(props) {
   };
 
   const handleSelect = (img) => {
-    console.log('hit', img);
-    setDogView(img);
-  };
+    console.log('hit', img)
+    setDogView(img)
+    selectDogTrade(true); // Change added here 
+  }
 
   const handleSubmit = () => {
     if (dogView === '' || dogName === '') {
@@ -116,7 +84,41 @@ function DogShop(props) {
   };
   /************ Subscribe for Groom **********/
 
-  return (
+// Placing trading functionality here
+const handleTrade = () => {
+  // If dog hasn't been selected
+   // Check if a dog has been selected for trading
+   if (dogView === "") {
+    alert("Select a dog to trade");
+  } else {
+    // Use axios.post() to trade the dog
+    axios
+      .post("/dog", {
+        name: dogName,
+        img: dogView,
+        owner: userId,
+      })
+      .then(({ data }) => {
+        // Update user's data after successful trade
+        setCoins(data.coinCount);
+        // Clear input fields
+        setDogName("");
+        setDogView("");
+        // Fetch updated list of dogs
+        getDogs();
+        // Optional: Provide feedback to the user
+        alert("Dog traded successfully!");
+      })
+      .catch((error) => {
+        console.error("Error trading dog:", error);
+        alert("Error trading dog. Please try again later.");
+      });
+  }
+};
+
+
+  return (    
+
     <div>
       {selectDogTrade ? (
         ''
@@ -159,28 +161,27 @@ function DogShop(props) {
                       onClick={() => setDogView(dog)}
                       eventKey={dog}
                       key={index}
-                    >
-                      <img src={dog} style={{ width: '250px' }} />
-                    </Dropdown.Item>
-                  ))}
-                </Dropdown.Menu>
-              </Dropdown>
-            </Form.Group>
-            <Form.Group>
-              <Form.Label>Trade a dog you own:</Form.Label>
-              <Button
-                variant='primary'
-                type='submit'
-                onClick={() => handleTrade()}
-              >
-                Trade Dog
-              </Button>
-            </Form.Group>
-          </Form>
-        </div>
-      ) : (
-        ''
-      )}
+                      >
+                       <img src={dog} style={{ width: "250px" }}/>
+                       </Dropdown.Item>
+                       ))}
+                  </Dropdown.Menu>
+                </Dropdown>
+              </Form.Group>
+              <Form.Group>
+                <Form.Label>Trade a dog you own:</Form.Label>
+                <Button variant="primary" type="submit" onClick={handleTrade}>
+                  Trade Dog
+                </Button>
+              </Form.Group>
+            </Form>
+          </div>
+        ) : (
+          ""
+        )}
+
+
+ 
 
       {dogShop ? (
         ''
