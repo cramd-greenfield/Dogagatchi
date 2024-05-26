@@ -1,22 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { Button, Form, Image, Dropdown, DropdownButton } from "react-bootstrap";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import { Button, Form, Image, Dropdown, DropdownButton } from 'react-bootstrap';
+import axios from 'axios';
 
 function DogShop(props) {
+  
   const { coins, setCoins } = props 
 
   const [selectDogTrade, setDogTrade] = useState(false);
 
   const [dogShop, setShop] = useState(false);
   const [breeds, setList] = useState([]);
-  const [dogView, setDogView] = useState("");
-  const [dogName, setDogName] = useState("");
-  const user = JSON.parse(sessionStorage.getItem("user"));
+  const [dogView, setDogView] = useState('');
+  const [dogName, setDogName] = useState('');
+  const user = JSON.parse(sessionStorage.getItem('user'));
   const [userId, setUserId] = useState(user._id);
 
   useEffect(() => {
     setUserId(user._id);
-    getDogs()
+    getDogs();
     axios.get(`/user/${user._id}`).then((userData) => {
       setCoins(userData.data[0].coinCount);
     });
@@ -41,11 +42,11 @@ function DogShop(props) {
   }
 
   const handleSubmit = () => {
-    if (dogView === "" || dogName === "") {
-      alert("Fill all fields");
+    if (dogView === '' || dogName === '') {
+      alert('Fill all fields');
     } else if (coins >= 15) {
       axios
-        .post("/dog", {
+        .post('/dog', {
           name: dogName,
           img: dogView,
           owner: userId,
@@ -57,7 +58,7 @@ function DogShop(props) {
       setDogs([]);
       setList([]);
     } else {
-      alert("Not enough coins!");
+      alert('Not enough coins!');
     }
     setShop(false);
   };
@@ -191,6 +192,7 @@ const handleTrade = () => {
                     </Dropdown.Menu>
                   </Dropdown>
                 {/* <Form.Select onChange={(e) => setDogView(e.target.value)}>
+ 
                   <option>Choose Dog</option>
                   {breeds.map((dog, index) => {
                     return (
@@ -203,22 +205,22 @@ const handleTrade = () => {
                     );
                   })}
                 </Form.Select> */}
-              </Form.Group>
-              <Form.Group>
-                <Form.Label>15 coins:</Form.Label>
-                <Button
-                  variant="primary"
-                  type="submit"
-                  onClick={() => handleSubmit()}
-                >
-                  Buy Dog
-                </Button>
-              </Form.Group>
-            </Form>
-          </div>
-        ) : (
-          ""
-        )}
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>15 coins:</Form.Label>
+              <Button
+                variant='primary'
+                type='submit'
+                onClick={() => handleSubmit()}
+              >
+                Buy Dog
+              </Button>
+            </Form.Group>
+          </Form>
+        </div>
+      ) : (
+        ''
+      )}
     </div>
   );
 }

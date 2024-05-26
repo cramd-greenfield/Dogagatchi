@@ -47,6 +47,15 @@ router.get('/meals/:userId', (req, res) => {
         .catch((err) => console.error('meals put req server ERROR:', err))
 })
 
+router.get('/medicines/:userId', (req, res) => {
+    const { userId } = req.params;
+    User.findById(userId)
+        .then((user) => {
+            res.status(200).send(user)
+        })
+        .catch((err) => console.error('medicines put req server ERROR:', err))
+})
+
 //GET USER BY USER ID
 
 router.get('/:userId', (req, res) => {
@@ -110,6 +119,69 @@ router.put('/meals/:userId', (req, res) => {
     }
 
 })
+
+// PUT ACTIVITIES BY USER ID
+// saving an activity OR deleting an activity
+router.put("/activities/:userId", (req, res) => {
+    const { userId } = req.params;
+    const { activityUpdate, newActivity } = req.body; 
+    if (activityUpdate === "addActivity") {
+      User.findByIdAndUpdate(userId, {
+        $push: { activities: newActivity },
+      })
+        .then((oldObj) => {
+          if (oldObj) {
+            // find + send the updated user
+            User.findById(userId)
+              .then((updatedUser) => {
+                res.status(200).send(updatedUser);
+              })
+              .catch((err) => {
+                res.sendStatus(500);
+              });
+          } else {
+            res.sendStatus(404);
+          }
+        })
+        .catch((err) => res.sendStatus(500));
+    } else if (activityUpdate === "deleteActivity") {
+      User.findByIdAndUpdate(userId, {
+        $pull: { activities: newActivity },
+      })
+        .then((oldObj) => {
+          if (oldObj) {
+            User.findById(userId)
+              .then((updatedUser) => {
+                res.status(200).send(updatedUser);
+              })
+              .catch((err) => {
+                res.sendStatus(500);
+              });
+          } else {
+            res.sendStatus(404);
+          }
+        })
+        .catch((err) => res.sendStatus(500));
+    }
+  });
+
+// UPDATE COINS BY ID
+router.put('/coins/:userId', (req, res) => {
+    const { userId } = req.params;
+    // const { coinCount } = req.body;
+
+    User.findByIdAndUpdate(userId, {
+        $inc: {coinCount: 1}
+    }, { returnDocument: 'after'})
+        .then(updatedUser => {
+            if (updatedUser) {
+                res.status(200).send(updatedUser)
+            } else {
+                res.sendStatus(404)
+            }
+        })
+        .catch(err => res.sendStatus(500))
+});
 
 //UPDATE USER BY USER ID
 

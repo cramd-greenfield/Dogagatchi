@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   password: String, // may be changed with passport implementation
   coinCount: Number, // increments with correct question and decrements to feed play with dog
   questionCount: Number, // increments with correct answer and stays
-  dogCount: Number, // increments when dogogachi is creates and decrements if dogogachi is deleted
+  dogCount: Number, // increments when dogogatchi is creates and decrements if dogogatchi is deleted
   breeds: [String], // array of image strings that are correctly answered
   achievements: [{ name: String, image: String, description: String }],
   meals: [
@@ -28,7 +28,20 @@ const userSchema = new mongoose.Schema({
       fullTime: String,
     },
   ],
+  activities: [
+    String
+],
+  medicines: [
+    {
+      name: String,
+      image: String,
+      idMedicine: Number,
+      cost: Number,
+      fullTime: String,
+    },
+  ],
   img: String,
+  groomed: [String], // Array of dogs that are subscribed to grooms
 });
 // creates user docs in the db
 const User = mongoose.model('User', userSchema);
@@ -38,12 +51,28 @@ const dogSchema = new mongoose.Schema({
   img: String, // breed
   feedDeadline: Date, // timers
   walkDeadline: Date, // timers
+  medicineDeadline: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  isGroomed: Boolean, 
+  activities: [String],
 });
 
 const Dog = mongoose.model('Dog', dogSchema);
 
+const wordSchema = new mongoose.Schema({
+  word: String,
+  phonetic: String,
+  meanings: [{ partOfSpeech: String, definitions: [String] }],
+  dogtionary: Boolean,
+  favorite: Boolean,
+  used: Boolean,
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog'},
+});
+
+const Word = mongoose.model('Word', wordSchema);
+
 module.exports = {
+  Word,
   User,
   Dog,
 };
