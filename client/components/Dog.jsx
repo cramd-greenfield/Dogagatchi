@@ -84,7 +84,7 @@ function Dog(props) {
         const sortedMedicines = data.medicines.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );
-        //console.log('meals', sortedMeals)
+        
         setMedicines(sortedMedicines);
       })
       .catch((err) => console.error("get signed in user ERROR", err));
