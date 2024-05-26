@@ -41,7 +41,6 @@ const userSchema = new mongoose.Schema({
     },
   ],
   img: String,
-  groomed: [String], // Array of dogs that are subscribed to grooms
 });
 // creates user docs in the db
 const User = mongoose.model('User', userSchema);
@@ -53,7 +52,7 @@ const dogSchema = new mongoose.Schema({
   walkDeadline: Date, // timers
   medicineDeadline: Date,
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  isGroomed: Boolean, 
+  isGroomed: Boolean,
   activities: [String],
 });
 
@@ -66,7 +65,7 @@ const wordSchema = new mongoose.Schema({
   dogtionary: Boolean,
   favorite: Boolean,
   used: Boolean,
-  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog'},
+  dog: { type: mongoose.Schema.Types.ObjectId, ref: 'Dog' },
 });
 
 const Word = mongoose.model('Word', wordSchema);

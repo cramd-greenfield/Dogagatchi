@@ -124,7 +124,7 @@ app.post('/auth/register', (req, res) => {
       User.create({
         username,
         password,
-        coinCount: 400,
+        coinCount: 14,
         questionCount: 0,
         img,
       }).then((user) => {

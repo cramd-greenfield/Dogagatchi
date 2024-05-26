@@ -13,7 +13,6 @@ import {
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import barkSound from '../../server/barking-123909.mp3';
-import Grooms from './Grooms.jsx';
 
 const bark = new Audio(barkSound);
 
@@ -24,9 +23,9 @@ function Dog(props) {
   const [happy, setHappy] = useState(false);
 
   const [health, setHealth] = useState(true);
-  const [feedStatus, setFeedStatus] = useState("");
-  const [walkStatus, setWalkStatus] = useState("");
-  const [healthStatus, setHealthStatus] = useState("");
+  const [feedStatus, setFeedStatus] = useState('');
+  const [walkStatus, setWalkStatus] = useState('');
+  const [healthStatus, setHealthStatus] = useState('');
 
   const [feedTimer, setFeedTimer] = useState(0);
   const [walkTimer, setWalkTimer] = useState(0);
@@ -38,6 +37,7 @@ function Dog(props) {
   const [dogtionary, setDogtionary] = useState([]);
   const [showDogtionary, setShowDogtionary] = useState(false);
   const [added, setAdded] = useState(false);
+  const [groom, setGroom] = useState([]);
   const [groomed, setGroomed] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
 
@@ -66,7 +66,6 @@ function Dog(props) {
     axios
       .get(`/user/meals/${userIdParam}`)
       .then(({ data }) => {
-      
         const sortedMeals = data.meals.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );
@@ -80,14 +79,13 @@ function Dog(props) {
     axios
       .get(`/user/medicines/${userIdParam}`)
       .then(({ data }) => {
-        
         const sortedMedicines = data.medicines.sort((a, b) =>
           a.name > b.name ? 1 : b.name > a.name ? -1 : 0
         );
-        //console.log('meals', sortedMeals)
+        
         setMedicines(sortedMedicines);
       })
-      .catch((err) => console.error("get signed in user ERROR", err));
+      .catch((err) => console.error('get signed in user ERROR', err));
   };
 
   const feedDog = (dogToFeedObj, mealToFeedObj) => {
@@ -119,30 +117,24 @@ function Dog(props) {
   /************ Subscribe for Groom **********/
   const subscribe = () => {
     if (coins >= 200) {
-      axios
-        .patch(`/groom/${dog._id}`, {
-          isGroomed: groomed,
-        })
-        .then(({ data }) => {
-          setCoins(data.coinCount);
-        });
+      axios.patch(`/groom/${dog._id}`).then(({ data }) => {
+        setCoins(data.coinCount);
+      });
       getDog();
-      setDog([]);
+      setGroom([]);
       setGroomed(true);
     } else {
       alert('Not enough coins!');
     }
-    setShop(false);
   };
   /************ Subscribe for Groom **********/
 
-                          // (dogToFeedObj, mealToFeedObj) 
+  // (dogToFeedObj, mealToFeedObj)
   const giveMedicine = (dogToGiveMeds, medsToGiveObj) => {
     const status = {
       medicineDeadline: new Date(
         new Date(dogToGiveMeds.medicineDeadline).getTime() + 24 * 60 * 60 * 1000
       ),
-
     };
 
     axios
@@ -152,15 +144,14 @@ function Dog(props) {
         axios
           .put(`user/medicines/${user._id}`, {
             update: {
-              type: "deleteMedicine",
+              type: 'deleteMedicine',
             },
             medicineToDelete: medsToGiveObj,
           })
           .then(() => getSignedInUserMedicines(user._id));
       })
-      .catch((err) => console.error("feed dog meal ERROR:", err));
+      .catch((err) => console.error('feed dog meal ERROR:', err));
   };
-
 
   const handleClick = (e) => {
     const status = {};
@@ -194,23 +185,24 @@ function Dog(props) {
         .catch((err) => {
           console.error(err);
         });
-      } else if (e === "medicine" && coins < 1) {
-        alert("Not enough coins!");
-      } else if (e === "medicine" && coins >= 1) {
-        setHealth(false);
-        medicineRef.current = health;
-        const medicineDeadline = Date.parse(dog.medicineDeadline) + 12 * 60 * 60 * 1000;
-        status.medicineDeadline = medicineDeadline;
-        setMedicineTimer(medicineDeadline);
-        axios
-          .put(`/dog/${dog._id}`, { status, cost: -3 })
-          .then(({ data }) => {
-            setCoins(data.coinCount);
-          })
-          .then(() => getDog())
-          .catch((err) => {
-            console.error(err);
-          });
+    } else if (e === 'medicine' && coins < 1) {
+      alert('Not enough coins!');
+    } else if (e === 'medicine' && coins >= 1) {
+      setHealth(false);
+      medicineRef.current = health;
+      const medicineDeadline =
+        Date.parse(dog.medicineDeadline) + 12 * 60 * 60 * 1000;
+      status.medicineDeadline = medicineDeadline;
+      setMedicineTimer(medicineDeadline);
+      axios
+        .put(`/dog/${dog._id}`, { status, cost: -3 })
+        .then(({ data }) => {
+          setCoins(data.coinCount);
+        })
+        .then(() => getDog())
+        .catch((err) => {
+          console.error(err);
+        });
     } else {
       bark.play();
     }
@@ -238,7 +230,9 @@ function Dog(props) {
         wordObj: word,
       })
       .then(() => setAdded(true))
-      .catch((err) => { console.error('Failed to add word to dogtionary', err) });
+      .catch((err) => {
+        console.error('Failed to add word to dogtionary', err);
+      });
   };
 
   const removeWordFromDogtionary = (e) => {
@@ -246,9 +240,13 @@ function Dog(props) {
     // delete request to /:word
     axios
       .delete(`/words/${word}`)
-      .then(() => { openDogtionary() })
-      .catch((err) => { console.error('Failed to delete word', err) })
-  }
+      .then(() => {
+        openDogtionary();
+      })
+      .catch((err) => {
+        console.error('Failed to delete word', err);
+      });
+  };
 
   const addFavoriteWord = (e) => {
     // update word.favorite in db
@@ -256,15 +254,19 @@ function Dog(props) {
     axios
       .patch(`/words/${word}`, {
         update: {
-            type: 'favorite'
+          type: 'favorite',
         },
         favUpdate: {
-            favorite: true
-        }
-    })
-    .then(() => { /* console.log('fav updated')*/ })
-    .catch((err) => { console.error('Failed to update favorite word', err)})
-  }
+          favorite: true,
+        },
+      })
+      .then(() => {
+        /* console.log('fav updated')*/
+      })
+      .catch((err) => {
+        console.error('Failed to update favorite word', err);
+      });
+  };
 
   const openDogtionary = () => {
     // get wordObjs from db in an array
@@ -275,9 +277,9 @@ function Dog(props) {
         setShowDogtionary(true);
       })
       .catch((err) => {
-        console.error('Failed to get dogtionary words', err)
+        console.error('Failed to get dogtionary words', err);
       });
-  }
+  };
 
   const handleCloseWord = () => setShowWord(false);
   const handleCloseDogtionary = () => setShowDogtionary(false);
@@ -292,12 +294,12 @@ function Dog(props) {
 
       const feedTimer = ((Date.parse(dog.feedDeadline) - now) / 86400000) * 100;
       const walkTimer = ((Date.parse(dog.walkDeadline) - now) / 86400000) * 100;
-      const medicineTimer = ((Date.parse(dog.medicineDeadline) - now) / 86400000) * 100;
+      const medicineTimer =
+        ((Date.parse(dog.medicineDeadline) - now) / 86400000) * 100;
 
       setFeedTimer(feedTimer);
       setWalkTimer(walkTimer);
       setMedicineTimer(medicineTimer);
-
 
       if (feedTimer < 25) {
         setFeedStatus('danger');
@@ -340,19 +342,19 @@ function Dog(props) {
       }
 
       if (medicineTimer < 25) {
-        setHealthStatus("danger");
+        setHealthStatus('danger');
         if (medicineRef.current !== true) {
           setHealth(true);
           medicineRef.current = health;
         }
       } else if (medicineTimer < 50) {
-        setHealthStatus("warning");
+        setHealthStatus('warning');
         if (medicineRef.current !== true) {
           setHealth(true);
           medicineRef.current = health;
         }
       } else {
-        setHealthStatus("success");
+        setHealthStatus('success');
         if (medicineRef.current !== false) {
           setHealth(false);
           medicineRef.current = health;
@@ -363,233 +365,243 @@ function Dog(props) {
   }, [happy, hungry, health, dog]);
 
   return (
-    <Card className='d-flex flex-row m-4'>
-      <div
-        className='d-flex flex-column justify-content-center align-items-center align-self-center '
-        style={{ width: '250px', height: '250px' }}
-      >
-        <Card.Img
-          src={dog.img}
-          alt='Sorry, your dog is in another kennel.'
-          className='p-4'
-        />
-
-        <Button variant='warning' onClick={() => subscribe}>
-          💎 Groom 💎
-        </Button>
-        <Form.Label>200 Coins!</Form.Label>
-      </div>
-      <div className='d-flex flex-column justify-content-center align-items-center w-100 '>
-        <Card.Title className='pt-2'>{dog.name}</Card.Title>
-        <Card.Body className='w-100'>
-          <div className='dog-status'>
-            <ProgressBar
-              animated={true}
-              striped
-              variant={feedStatus}
-              now={feedTimer}
-              label='HUNGER'
-              style={{ height: '35px' }}
+    <div>
+      {groomed ? (
+        <Card className='d-flex flex-row m-4 card text-white bg-warning mb-3'>
+          <div
+            className='d-flex flex-column justify-content-center align-items-center align-self-center'
+            style={{ width: '250px', height: '250px' }}
+          >
+            <Card.Img
+              src={dog.img}
+              alt='Sorry, your dog does not want to be seen with you...'
+              className='p-4'
             />
-            {hungry ? (
-              <Button
-                className='w-100 mx-0'
-                variant='info'
-                onClick={() => handleClick('feed')}
-                title={'pay 3 coins'}
-              >
-                🍖
-              </Button>
-            ) : (
-              <Button
-                className='w-100 mx-0'
-                variant='info'
-                onClick={() => handleClick('bark')}
-              >
-                🦴
-              </Button>
-            )}
-            <ProgressBar
-              animated={true}
-              striped
-              variant={walkStatus}
-              now={walkTimer}
-              label='HAPPINESS'
-              style={{ height: '35px' }}
-            />
-
-            {happy ? (
-              <Button
-                className='w-100 mx-0'
-                variant='info'
-                onClick={() => handleClick('bark')}
-              >
-                🐶
-              </Button>
-            ) : (
-              <Button
-                className='w-100 mx-0'
-                variant='info'
-                onClick={() => handleClick('walk')}
-              >
-                🐕‍🦺
-              </Button>
-            )}
-            <ProgressBar
-              animated={true}
-              striped
-              variant={healthStatus}
-              now={medicineTimer}
-              label="HEALTH"
-              style={{ height: "35px" }}
-            />
-            {meals ? (
-              <DropdownButton title='Feed from Pantry!'>
-                {meals.map((meal) => (
-                  <Dropdown.Item
-                    key={meal._id}
-                    onClick={() => {
-                      feedDog(dog, meal);
-                    }}
-                  >
-                    {meal.name}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
-            ) : (
-              <DropdownButton title='Feed from Pantry!'>
-                <Dropdown.Item>
-                  Visit Bone Appétit Café to buy your first meal!
-                </Dropdown.Item>
-              </DropdownButton>
-            )}
-            {medicines ? (
-              <DropdownButton title="Cure with Meds!">
-                {medicines.map((medicine) => (
-                  <Dropdown.Item
-                    key={medicine._id}
-                    onClick={() => {
-                      giveMedicine(dog, medicine);
-                    }}
-                  >
-                    {medicine.name}
-                  </Dropdown.Item>
-                ))}
-              </DropdownButton>
-            ) : (
-              <DropdownButton title="Feed from Pantry!">
-                <Dropdown.Item>
-                  Go to the Get Well Center before ya dog die and become a PACK🚬!
-                </Dropdown.Item>
-              </DropdownButton>
-            )}
-            
-
-            <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-            <Modal
-              show={showWord}
-              onHide={handleCloseWord}
-              scrollable={true}
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>Word Of The Day</Modal.Title>
-              </Modal.Header>
-                { showWord ? (
-                  <Modal.Body>
-                    <h2>{ word.word }</h2>
-                    <p>{ word.phonetic }</p>
-                    {word.meanings.map((meaning, i) => {
-                      return (
-                        <div key={i}>
-                          <em>{ meaning.partOfSpeech }</em>
-                          <ol>
+          </div>
+          <div className='d-flex flex-column justify-content-center align-items-center w-100'>
+            <Card.Title className='pt-2'>{dog.name}</Card.Title>
+            <Card.Body className='w-100'>
+              <div className='dog-status'>
+                <ProgressBar
+                  animated={true}
+                  striped
+                  now={100}
+                  variant='warning'
+                  label='FAVORITE'
+                  style={{ height: '35px' }}
+                />
+                <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
+                <Modal show={showWord} onHide={handleCloseWord}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Word Of The Day</Modal.Title>
+                  </Modal.Header>
+                  {showWord ? (
+                    <Modal.Body>
+                      <h2>{word.word}</h2>
+                      <p>{word.phonetic}</p>
+                      {word.meanings.map((meaning) => {
+                        return (
+                          <>
+                            <em>{meaning.partOfSpeech}</em>
                             {meaning.definitions.map((def, i) => {
-                              return <li key={i}>{ `${def}` }</li>;
+                              return <p>{`${i + 1}: ${def}`}</p>;
                             })}
-                          </ol>
-                        </div>
-                      )
-                    })}
-                  </Modal.Body>
+                          </>
+                        );
+                      })}
+                    </Modal.Body>
                   ) : (
                     <h2>placeholder</h2>
                   )}
-              <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseWord}>Close</Button>
-                { added ? (
-                  <Button variant='outline-primary'>
-                    Added!
+                  <Modal.Footer>
+                    <Button variant='secondary' onClick={handleCloseWord}>
+                      Close
+                    </Button>
+                    <Button variant='primary'>Add to Dogtionary!</Button>
+                  </Modal.Footer>
+                </Modal>
+              </div>
+            </Card.Body>
+          </div>
+        </Card>
+      ) : (
+        <Card className='d-flex flex-row m-4'>
+          <div
+            className='d-flex flex-column justify-content-center align-items-center align-self-center '
+            style={{ width: '250px', height: '250px' }}
+          >
+            <Card.Img
+              src={dog.img}
+              alt='Sorry, your dog is in another kennel.'
+              className='p-4'
+            />
+
+            <Button variant='warning' onClick={subscribe}>
+              💎 Groom 💎
+            </Button>
+            <Form.Label>200 Coins!</Form.Label>
+          </div>
+          <div className='d-flex flex-column justify-content-center align-items-center w-100 '>
+            <Card.Title className='pt-2'>{dog.name}</Card.Title>
+            <Card.Body className='w-100'>
+              <div className='dog-status'>
+                <ProgressBar
+                  animated={true}
+                  striped
+                  variant={feedStatus}
+                  now={feedTimer}
+                  label='HUNGER'
+                  style={{ height: '35px' }}
+                />
+                {hungry ? (
+                  <Button
+                    className='w-100 mx-0'
+                    variant='info'
+                    onClick={() => handleClick('feed')}
+                    title={'pay 3 coins'}
+                  >
+                    🍖
                   </Button>
                 ) : (
-                  <Button variant='primary' onClick={addWordToDogtionary}>
-                    Add to Dogtionary
-                  </Button>)
-                }
-              </Modal.Footer>
-            </Modal>
+                  <Button
+                    className='w-100 mx-0'
+                    variant='info'
+                    onClick={() => handleClick('bark')}
+                  >
+                    🦴
+                  </Button>
+                )}
+                <ProgressBar
+                  animated={true}
+                  striped
+                  variant={walkStatus}
+                  now={walkTimer}
+                  label='HAPPINESS'
+                  style={{ height: '35px' }}
+                />
 
-            <Button variant='primary' onClick={openDogtionary}>
-              {`${dog.name}'s Dogtionary`}
-            </Button>
-            <Modal
-              show={showDogtionary}
-              onHide={handleCloseDogtionary}
-              scrollable={true}
-            >
-              <Modal.Header closeButton>
-                <Modal.Title>{`${dog.name}'s Dogtionary`}</Modal.Title>
-              </Modal.Header>
-                <Modal.Body>
-                  { dogtionary.map((word, i) => {
-                    return (
-                      <Modal.Dialog key={`${i}`}>
-                        <h2>{ word.word }</h2>
-                        <p>{ word.phonetic }</p>
-                        <ButtonGroup>
-                          <ToggleButton
-                            id="toggle-check"
-                            type="checkbox"
-                            variant="secondary"
-                            // checked={checked}
-                            value={word.word}
-                            onChange={addFavoriteWord}
-                          >
-                            ⭐️
-                          </ToggleButton>
-                        </ButtonGroup>
-                        {word.meanings.map((meaning, i) => {
-                          return (
-                            <div key={i}>
-                              <em>{ meaning.partOfSpeech }</em>
-                              <ol>
-                                {meaning.definitions.map((def, i) => {
-                                  return <li key={i}>{ `${def}` }</li>;
-                                })}
-                              </ol>
-                            </div>
-                          )
-                        })}
-                        <Button
-                          variant='secondary'
-                          value={word.word}
-                          onClick={removeWordFromDogtionary}
-                        >
-                          Remove
-                        </Button>
-                      </Modal.Dialog>
-                    )
-                  })
-                  }
+                {happy ? (
+                  <Button
+                    className='w-100 mx-0'
+                    variant='info'
+                    onClick={() => handleClick('bark')}
+                  >
+                    🐶
+                  </Button>
+                ) : (
+                  <Button
+                    className='w-100 mx-0'
+                    variant='info'
+                    onClick={() => handleClick('walk')}
+                  >
+                    🐕‍🦺
+                  </Button>
+                )}
+                <ProgressBar
+                  animated={true}
+                  striped
+                  variant={healthStatus}
+                  now={medicineTimer}
+                  label='HEALTH'
+                  style={{ height: '35px' }}
+                />
+                {meals ? (
+                  <DropdownButton title='Feed from Pantry!'>
+                    {meals.map((meal) => (
+                      <Dropdown.Item
+                        key={meal._id}
+                        onClick={() => {
+                          feedDog(dog, meal);
+                        }}
+                      >
+                        {meal.name}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                ) : (
+                  <DropdownButton title='Feed from Pantry!'>
+                    <Dropdown.Item>
+                      Visit Bone Appétit Café to buy your first meal!
+                    </Dropdown.Item>
+                  </DropdownButton>
+                )}
+                {medicines ? (
+                  <DropdownButton title='Cure with Meds!'>
+                    {medicines.map((medicine) => (
+                      <Dropdown.Item
+                        key={medicine._id}
+                        onClick={() => {
+                          giveMedicine(dog, medicine);
+                        }}
+                      >
+                        {medicine.name}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                ) : (
+                  <DropdownButton title='Feed from Pantry!'>
+                    <Dropdown.Item>
+                      Go to the Get Well Center before ya dog die and become a
+                      PACK🚬!
+                    </Dropdown.Item>
+                  </DropdownButton>
+                )}
 
-                </Modal.Body>
-              <Modal.Footer>
-                <Button variant='secondary' onClick={handleCloseDogtionary}>Close</Button>
-              </Modal.Footer>
-            </Modal>
+                <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
+                <Modal show={showWord} onHide={handleCloseWord}>
+                  <Modal.Header closeButton>
+                    <Modal.Title>Word Of The Day</Modal.Title>
+                  </Modal.Header>
+
+                  {showWord ? (
+                    <Modal.Body>
+                      <h2>{word.word}</h2>
+                      <p>{word.phonetic}</p>
+                      {word.meanings.map((meaning) => {
+                        return (
+                          <>
+                            <em>{meaning.partOfSpeech}</em>
+                            {meaning.definitions.map((def, i) => {
+                              return <p>{`${i + 1}: ${def}`}</p>;
+                            })}
+                          </>
+                        );
+                      })}
+                    </Modal.Body>
+                  ) : (
+                    <h2>placeholder</h2>
+                  )}
+
+                  {showWord ? (
+                    <Modal.Body>
+                      {dogtionary.map((word, i) => {
+                        return (
+                          <div key={i}>
+                            <em>{meaning.partOfSpeech}</em>
+                            {meaning.definitions.map((def, i) => {
+                              return <p key={i}>{`${i + 1}: ${def}`}</p>;
+                            })}
+                          </div>
+                        );
+                      })}
+                    </Modal.Body>
+                  ) : (
+                    <h2>placeholder</h2>
+                  )}
+
+                  <Modal.Footer>
+                    <Button variant='secondary' onClick={handleCloseWord}>
+                      Close
+                    </Button>
+                    <Button variant='primary'>Add to Dogtionary!</Button>
+                  </Modal.Footer>
+                </Modal>
+              </div>
+            </Card.Body>
           </div>
-        </Card.Body>
-      </div>
-    </Card>
+        </Card>
+      )}
+    </div>
   );
 }
 

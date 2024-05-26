@@ -26,7 +26,7 @@ function Medicine(props) {
       })
         .then(({ data }) => {
           setUser(data._id)
-          setPurchaseText(`Awesome! You bought your pup some ${medicine.name} and now have ${data.coinCount} tokens!`)
+          setPurchaseText(`TY Come again!❤️`)
           setCoins(data.coinCount)
         })
         .then(() => {
@@ -38,9 +38,9 @@ function Medicine(props) {
   }
 
   return (
-    <Card className="meal-container my-2 p-2">
+    <Card className="medicine-container my-2 p-2">
       <div className='d-flex flex-row w-75'>
-        <Image id="meal-item" className="meal-image p-2" src={`${props.medicine.image}`} roundedCircle />
+        <Image id="medicine-item" className="medicine-image p-2" src={`${props.medicine.image}`} roundedCircle />
         <Card.Body className='d-flex flex-column'>
           <Card.Title id="medicine-item">{props.medicine.name}</Card.Title>
           <Card.Text id="medicine-item">{`${props.medicine.cost} coins`}</Card.Text>

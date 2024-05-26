@@ -3,18 +3,16 @@ const { User, Dog } = require('../db');
 
 const router = Router();
 
-// Get user's owned dogs and available for purchase
+// Get user's Groomed dogs
 router.get('/:userId', (req, res) => {
-  const { userId } = req.params;
-  Dog.find({ owner: userId })
-    .then((owned) => {
-      User.findById(userId)
-        .then(({ breeds }) => {
-          res.status(200).send({ owned, breeds });
-        })
-        .catch((err) => {
-          console.error('Owner does not have any dogs:', err);
-        });
+  Dog.find({ isGroomed: true })
+    .then((groom) => {
+      if (groom) {
+        res.status(200).send(groom);
+      } else {
+        console.log('Could not find Groomed Dogs');
+        res.sendStatus(404);
+      }
     })
     .catch((err) => {
       console.error('failed to GET dog by userId', err);
@@ -22,44 +20,51 @@ router.get('/:userId', (req, res) => {
     });
 });
 
-//get all groomed dogs
-router.get('/member/:userId', (req, res) => {
-  const { dogId, userId } = req.params;
-  console.log(dogId);
-  Dog.find({ id: dogId })
+// buy dog  from shop with subscription
+router.post('/member', (req, res) => {
+  const { name, img, userId, owner } = req.body;
+  const status = new Date('3000-12-31T23:59:00Z');
+
+  Dog.create({
+    name,
+    img,
+    owner,
+    feedDeadline: status,
+    walkDeadline: status,
+    isGroomed: true,
+  })
     .then(() => {
-      User.findById(userId)
-        .then(({ groomed }) => {
-          res.status(200).send({ groomed });
-        })
-        .catch((err) => {
-          console.error('Owner does not have any dogs:', err);
-        });
+      User.findByIdAndUpdate(
+        userId,
+        { $inc: { coinCount: -185, dogCount: -1 }, $pull: { breeds: img } },
+        { new: true }
+      ).catch((err) => {
+        console.error('Failed to UPDATE user', err);
+        res.sendStatus(500);
+      });
+    })
+    .then((updatedUser) => {
+      res.status(201).send(updatedUser);
     })
     .catch((err) => {
-      console.error('failed to GET dog by userId', err);
+      console.error('Failed to CREATE dog', err);
       res.sendStatus(500);
     });
 });
 
 // change to isGroomed to create subscription
 router.patch('/:dogId', (req, res) => {
-  const { img, owner } = req.body;
+  const { owner } = req.body;
   const { dogId } = req.params;
-  const status = new Date('3000-12-31T23:59:99Z');
+  const status = new Date('3000-12-31T23:59:00Z');
 
-  console.log(status1);
-  console.log(status);
   Dog.findByIdAndUpdate(dogId, {
     $set: { isGroomed: true, feedDeadline: status, walkDeadline: status },
   })
     .then(() => {
-      return User.findByIdAndUpdate(
+      User.findByIdAndUpdate(
         owner,
-        {
-          $inc: { coinCount: -200 },
-          $push: { groomed: img },
-        },
+        { $inc: { coinCount: -200 } },
         { new: true }
       ).catch((err) => {
         console.error('Failed to UPDATE user', err);
@@ -75,41 +80,15 @@ router.patch('/:dogId', (req, res) => {
     });
 });
 
-// router.post('/', (req, res) => {
-//   const { name, img, owner } = req.body;
-//   const { id } = req.params;
-//     const status = new Date(new Date().getTime() + 100000000 * 100000);
-//   console.log(status);
+router.delete('/unsubscribe', (req, res) => {
+  const { _id } = req.params;
 
-//   Dog.findOneAndReplace(id, {
-//     name,
-//     img,
-//     owner,
-//     feedDeadline: status,
-//     walkDeadline: status,
-//     isGroomed: true,
-//   })
-//     .then(() => {
-//       return User.findByIdAndUpdate(
-//         owner,
-//         { $inc: { coinCount: -15, dogCount: -1 }, $pull: { groomed: img } },
-//         { new: true }
-//       ).catch((err) => {
-//         console.error('SERVER ERROR: failed to UPDATE user', err);
-//         res.sendStatus(500);
-//       });
-//     })
-//     .then((updatedUser) => {
-//       res.status(201).send(updatedUser);
-//     })
-//     .catch((err) => {
-//       console.error('SERVER ERROR: failed to CREATE dog', err);
-//       res.sendStatus(500);
-//     });
-// });
-
-router.delete('/groomed/:dogId', (req, res) => {
-  //
+  Dog.findByIdAndRemove(_id)
+    .then((deletedSub) => res.status(200).send(deletedSub))
+    .catch((err) => {
+      console.error('delete user ERROR server', err);
+      res.sendStatus(500);
+    });
 });
 
 module.exports = router;
