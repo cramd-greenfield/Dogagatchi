@@ -33,6 +33,7 @@ function Dog(props) {
   const [meals, setMeals] = useState([]);
   const [medicines, setMedicines] = useState([]); //useState hook that updates the medicines array
   const [word, setWord] = useState({});
+  const [isFavWord, setIsFavWord] = useState(false);
   const [showWord, setShowWord] = useState(false);
   const [dogtionary, setDogtionary] = useState([]);
   const [showDogtionary, setShowDogtionary] = useState(false);
@@ -257,11 +258,12 @@ function Dog(props) {
           type: 'favorite',
         },
         favUpdate: {
-          favorite: true,
+          favorite: !isFavWord,
         },
       })
       .then(() => {
-        /* console.log('fav updated')*/
+        openDogtionary();
+        setIsFavWord(!isFavWord);
       })
       .catch((err) => {
         console.error('Failed to update favorite word', err);
@@ -393,8 +395,9 @@ function Dog(props) {
                   label='FAVORITE'
                   style={{ height: '35px' }}
                 />
-                <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
+                <Button onClick={fetchAndShowWord}>Speak!</Button>
                 <WordOfTheDay
+                  dog={dog}
                   showWord={showWord}
                   handleCloseWord={handleCloseWord}
                   word={word}
@@ -539,8 +542,9 @@ function Dog(props) {
                   </DropdownButton>
                 )}
 
-                <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
+                <Button onClick={fetchAndShowWord}>Speak!</Button>
                 <WordOfTheDay
+                  dog={dog}
                   showWord={showWord}
                   handleCloseWord={handleCloseWord}
                   word={word}

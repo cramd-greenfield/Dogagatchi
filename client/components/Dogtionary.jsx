@@ -31,16 +31,25 @@ const Dogtionary = (props) => {
               <Modal.Dialog key={`${i}`}>
                 <h2>{ word.word }</h2>
                 <p>{ word.phonetic }</p>
-                <Button
-                  id="toggle-check"
-                  type="checkbox"
-                  variant="secondary"
-                  // checked={checked}
+                { word.favorite ? (
+                  <Button
+                  variant="warning"
+                  size='sm'
                   value={word.word}
-                  onChange={addFavoriteWord}
+                  onClick={addFavoriteWord}
                 >
                   ⭐️
                 </Button>
+              ) :(
+                <Button
+                  variant="secondary"
+                  size='sm'
+                  value={word.word}
+                  onClick={addFavoriteWord}
+                >
+                  ⭐️
+                </Button>
+              )}
                 {word.meanings.map((meaning, i) => {
                   return (
                     <div key={i}>
@@ -55,6 +64,7 @@ const Dogtionary = (props) => {
                 })}
                 <Button
                   variant='secondary'
+                  size='sm'
                   value={word.word}
                   onClick={removeWordFromDogtionary}
                 >
