@@ -7,6 +7,7 @@ import {
 const WordOfTheDay = (props) => {
   // destructure props
   const {
+    dog,
     showWord,
     handleCloseWord,
     word,
@@ -22,7 +23,7 @@ const WordOfTheDay = (props) => {
       scrollable={true}
       >
       <Modal.Header closeButton>
-        <Modal.Title>Word Of The Day</Modal.Title>
+        <Modal.Title>{`${dog.name} says...`}</Modal.Title>
       </Modal.Header>
 
       {showWord ? (
