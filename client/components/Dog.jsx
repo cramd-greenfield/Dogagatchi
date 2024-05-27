@@ -117,10 +117,15 @@ function Dog(props) {
 
   /************ Subscribe for Groom **********/
   const subscribe = () => {
+    console.log(user);
     if (coins >= 200) {
-      axios.patch(`/groom/${dog._id}`).then(({ data }) => {
-        setCoins(data.coinCount);
-      });
+      axios
+        .patch(`/groom/${dog._id}`, {
+          owner: user._id,
+        })
+        .then(({ data }) => {
+          setCoins(data.coinCount);
+        });
       getDog();
       setGroom([]);
       setGroomed(true);
