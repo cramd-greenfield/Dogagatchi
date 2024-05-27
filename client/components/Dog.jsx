@@ -5,14 +5,14 @@ import {
   Card,
   Dropdown,
   DropdownButton,
-  ButtonGroup,
-  ToggleButton,
   Modal,
   Form,
 } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import barkSound from '../../server/barking-123909.mp3';
+import Dogtionary from './Dogtionary.jsx';
+import WordOfTheDay from './WordOfTheDay.jsx';
 
 const bark = new Audio(barkSound);
 
@@ -281,7 +281,10 @@ function Dog(props) {
       });
   };
 
-  const handleCloseWord = () => setShowWord(false);
+  const handleCloseWord = () => {
+    setShowWord(false);
+    setAdded(false);
+  };
   const handleCloseDogtionary = () => setShowDogtionary(false);
 
   useEffect(() => {
@@ -391,35 +394,24 @@ function Dog(props) {
                   style={{ height: '35px' }}
                 />
                 <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-                <Modal show={showWord} onHide={handleCloseWord}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Word Of The Day</Modal.Title>
-                  </Modal.Header>
-                  {showWord ? (
-                    <Modal.Body>
-                      <h2>{word.word}</h2>
-                      <p>{word.phonetic}</p>
-                      {word.meanings.map((meaning) => {
-                        return (
-                          <>
-                            <em>{meaning.partOfSpeech}</em>
-                            {meaning.definitions.map((def, i) => {
-                              return <p>{`${i + 1}: ${def}`}</p>;
-                            })}
-                          </>
-                        );
-                      })}
-                    </Modal.Body>
-                  ) : (
-                    <h2>placeholder</h2>
-                  )}
-                  <Modal.Footer>
-                    <Button variant='secondary' onClick={handleCloseWord}>
-                      Close
-                    </Button>
-                    <Button variant='primary'>Add to Dogtionary!</Button>
-                  </Modal.Footer>
-                </Modal>
+                <WordOfTheDay
+                  showWord={showWord}
+                  handleCloseWord={handleCloseWord}
+                  word={word}
+                  added={added}
+                  addWordToDogtionary={addWordToDogtionary}
+                />
+                <Button variant='primary' onClick={openDogtionary}>
+                  {`${dog.name}'s Dogtionary`}
+                </Button>
+                <Dogtionary
+                  showDogtionary={showDogtionary}
+                  handleCloseDogtionary={handleCloseDogtionary}
+                  dog={dog}
+                  dogtionary={dogtionary}
+                  removeWordFromDogtionary={removeWordFromDogtionary}
+                  addFavoriteWord={addFavoriteWord}
+                />
               </div>
             </Card.Body>
           </div>
@@ -548,54 +540,24 @@ function Dog(props) {
                 )}
 
                 <Button onClick={fetchAndShowWord}>Word of the Day!</Button>
-                <Modal show={showWord} onHide={handleCloseWord}>
-                  <Modal.Header closeButton>
-                    <Modal.Title>Word Of The Day</Modal.Title>
-                  </Modal.Header>
-
-                  {showWord ? (
-                    <Modal.Body>
-                      <h2>{word.word}</h2>
-                      <p>{word.phonetic}</p>
-                      {word.meanings.map((meaning) => {
-                        return (
-                          <>
-                            <em>{meaning.partOfSpeech}</em>
-                            {meaning.definitions.map((def, i) => {
-                              return <p>{`${i + 1}: ${def}`}</p>;
-                            })}
-                          </>
-                        );
-                      })}
-                    </Modal.Body>
-                  ) : (
-                    <h2>placeholder</h2>
-                  )}
-
-                  {showWord ? (
-                    <Modal.Body>
-                      {dogtionary.map((word, i) => {
-                        return (
-                          <div key={i}>
-                            <em>{meaning.partOfSpeech}</em>
-                            {meaning.definitions.map((def, i) => {
-                              return <p key={i}>{`${i + 1}: ${def}`}</p>;
-                            })}
-                          </div>
-                        );
-                      })}
-                    </Modal.Body>
-                  ) : (
-                    <h2>placeholder</h2>
-                  )}
-
-                  <Modal.Footer>
-                    <Button variant='secondary' onClick={handleCloseWord}>
-                      Close
-                    </Button>
-                    <Button variant='primary'>Add to Dogtionary!</Button>
-                  </Modal.Footer>
-                </Modal>
+                <WordOfTheDay
+                  showWord={showWord}
+                  handleCloseWord={handleCloseWord}
+                  word={word}
+                  added={added}
+                  addWordToDogtionary={addWordToDogtionary}
+                />
+                <Button variant='primary' onClick={openDogtionary}>
+                  {`${dog.name}'s Dogtionary`}
+                </Button>
+                <Dogtionary
+                  showDogtionary={showDogtionary}
+                  handleCloseDogtionary={handleCloseDogtionary}
+                  dog={dog}
+                  dogtionary={dogtionary}
+                  removeWordFromDogtionary={removeWordFromDogtionary}
+                  addFavoriteWord={addFavoriteWord}
+                />
               </div>
             </Card.Body>
           </div>
