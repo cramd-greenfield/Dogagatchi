@@ -22,7 +22,7 @@ function NavBar(props) {
             <Nav.Link className='ms-auto' as={Link} to='/user'>
               My Kennel 🦴
             </Nav.Link>
-            <Nav.Link className='ms-auto' as={Link} to='/quiz'>
+            <Nav.Link className='ms-auto' as={Link} to='/activity'>
               Activities ✨
             </Nav.Link>
             <Nav.Link className='ms-auto' as={Link} to='/quiz'>
