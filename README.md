@@ -42,9 +42,11 @@ Environment variables are loaded from the .env file through the config.js file u
 
 Only three environment variables require assigning to serve/deploy Dogagatchi+:
 
-1. MongoDB Atlas database connection string (see above and below)
+1. MongoDB Atlas database connection string (see above and below) \*
 2. Google Passport Client ID
 3. Google Passport Client Secret
+
+\* You can also use a local hosted database like [MongDB Community](https://www.mongodb.com/try/download/community). In that case, use a string to name the database and replace the ATLAS_URI with your local database name.
 
 Checkout config.js in the server folder to see the three in action, and define them for your version in the .env file (which is not tracked by git and will therefore not show up when you pull the repo down).
 
@@ -120,6 +122,10 @@ Double-check versions with the following commands:
 > nvm --version  
 > node --version  
 > npm --version
+
+#### 5.5 Install MongoDb Community Edition
+
+If you choose to use MongoDb Community instead of ATLAS, follow the instructions [here](https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/) to install on an Ubuntu instance.
 
 ### 6. Clone repo, download dependencies, configure db
 
