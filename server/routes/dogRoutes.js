@@ -131,6 +131,72 @@ router.put('/:dogId', (req, res) => {
     });
 });
 
+/*********************** PUT REQUEST FOR TRADE *************************************/
+router.put('/trade', (req, res) => {
+  const { userId, ownedDogId, non_ownedDog } = req.body;
+
+  // Find the user who owns the dog being traded
+  User.findById(userId)
+    .then((user) => {
+      if (!user) {
+        return res.status(404).send({ message: "User not found" });
+      }
+
+      // Convert user.ownedDogs to a JavaScript array
+      const ownedDogsArray = Array.from(user.ownedDogs);
+
+      // Find the index of the owned dog being traded
+      const index = ownedDogsArray.indexOf(ownedDogId);
+      if (index === -1) {
+        return res.status(404).send({ message: "Owned dog not found" });
+      }
+
+      // Remove the owned dog from the array
+      ownedDogsArray.splice(index, 1);
+
+      // Find the dog object based on its image URL from the database
+      Dog.findOne({ img: non_ownedDog })
+        .then((foundDog) => {
+          if (!foundDog) {
+            return res.status(404).send({ message: "Non-owned dog not found" });
+          }
+
+          // Add the found dog to the user's owned dogs array
+          ownedDogsArray.push(foundDog._id);
+
+          // Update the user's ownedDogs field with the modified array
+          user.ownedDogs = ownedDogsArray;
+
+          // Save the updated user
+          user.save()
+            .then(() => {
+              // Delete the traded dog from the database
+              Dog.findByIdAndDelete(ownedDogId)
+                .then(() => {
+                  // Respond with success message
+                  res.status(200).send({ message: "Dog traded successfully" });
+                })
+                .catch((error) => {
+                  console.error("Error deleting traded dog:", error);
+                  res.status(500).send({ message: "Error trading dog" });
+                });
+            })
+            .catch((error) => {
+              console.error("Error saving updated user:", error);
+              res.status(500).send({ message: "Error trading dog" });
+            });
+        })
+        .catch((error) => {
+          console.error("Error finding non-owned dog:", error);
+          res.status(500).send({ message: "Error trading dog" });
+        });
+    })
+    .catch((error) => {
+      console.error("Error finding user:", error);
+      res.status(500).send({ message: "Error trading dog" });
+    });
+});
+
 // **************** DELETE ROUTES ********************
 
 // DELETE ALL DOGS BY USER ID
